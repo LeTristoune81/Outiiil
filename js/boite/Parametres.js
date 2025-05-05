@@ -133,4 +133,18 @@ class BoiteParametre extends Boite
         </form>`);
         return this;
     }
+	     // après les autres paramètres...
+this.parametres["uniteAntisondeTerrain"] = new Parametre({
+cle: "uniteAntisondeTerrain",
+libelle: "Antisonde – terrain",
+ type: "number",
+valeurDefaut: 1
+});
+ this.parametres["uniteAntisondeDome"]    = new Parametre({
+ cle: "uniteAntisondeDome",
+libelle: "Antisonde – dôme",
+ type: "number",
+valeurDefaut: 1
+});
+
 }
