@@ -90,7 +90,7 @@ class PageArmee
         // Affichage du temps Hof de votre armée
         $(".simulateur:first").append("<tr><td colspan=10>Temps <span class='gras' title='Hall Of Fame' >HOF : " + Utils.shortcutTime(this._armeeTdc.getTemps(0) + this._armeeDome.getTemps(0) + this._armeeLoge.getTemps(0)) + "</span>, Temps relatif : <span class='gras'>" + Utils.shortcutTime(this._armeeTdc.getTemps(monProfil.getTDP()) + this._armeeDome.getTemps(monProfil.getTDP()) + this._armeeLoge.getTemps(monProfil.getTDP())) + "</span></td></tr>");
         // Affichage des statistiques detaillés
-        // this.afficherStatistique();
+        // (désactivé) this.afficherStatistique();
 // return this;
     }
     /**
