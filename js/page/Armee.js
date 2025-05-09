@@ -62,30 +62,11 @@ class PageArmee
         $("h3:eq(2)").append(` ${this._nbAttaque}, reste : ${(monProfil.niveauRecherche[6] + 1 - this._nbAttaque)}.</p>`);
         // Affichage du nombre total d'unité
         $("h3:first").append(` (${numeral(this._armeeTdc.getSommeUnite() + this._armeeDome.getSommeUnite() + this._armeeLoge.getSommeUnite()).format()})</p>`);
-        // Bouton antisonde
-        $(".simulateur:eq(0) tr:eq(0)").after(`<tr><td colspan="10" class='right'><button id='o_replaceArmee' class='o_button f_success'>Replacer l'armée</button></td></tr>`);
-        $("#o_replaceArmee").click(() => {
-            if(this._armeeLoge.getSommeUnite() + this._armeeDome.getSommeUnite() + this._armeeTdc.getSommeUnite()){
-                let premiereUnite = this.indicePremiereUnite();
-                let nbUniteDispo = this._armeeLoge.unite[premiereUnite] + this._armeeDome.unite[premiereUnite] + this._armeeTdc.unite[premiereUnite];
-                // si j'ai assez d'unité pour mettre les antisonde en param
-                if(nbUniteDispo >= monProfil.parametre["uniteAntisondeDome"].valeur + monProfil.parametre["uniteAntisondeTerrain"].valeur){
-                    // si les unités en terrain et dome ne sont pas dans les bornes dasn antisonde on replace tout sinon on est bon
-                    if(!this.estPlacePourAntiSonde(premiereUnite, monProfil.parametre["uniteAntisondeTerrain"].valeur, monProfil.parametre["uniteAntisondeDome"].valeur))
-                        this.placerAntisondeSuffisant(premiereUnite, nbUniteDispo);
-                    else
-                        $.toast({...TOAST_INFO, text : "Votre armée est déjà placée correctement."});
-                }else{
-                    if(!this.estPlacePourAntiSonde(premiereUnite, 1, nbUniteDispo * 0.3))
-                        this.placerAntisondeInsuffisant(premiereUnite, nbUniteDispo);
-                    else
-                        $.toast({...TOAST_INFO, text : "Votre armée est déjà placée correctement."});
-                }
-            }else
-                $.toast({...TOAST_ERROR, text : "Aucune unité n'est transférable."});
-            return false;
-        });
-
+- // Bouton antisonde
+- $(".simulateur:eq(0) tr:eq(0)").after(`<tr>…</tr>`);
+- $("#o_replaceArmee").click(() => {
+-   /* code de replacement antisonde */
+- });
         if(!Utils.comptePlus) this.plus();
         // Affichage du temps Hof de votre armée
         $(".simulateur:first").append("<tr><td colspan=10>Temps <span class='gras' title='Hall Of Fame' >HOF : " + Utils.shortcutTime(this._armeeTdc.getTemps(0) + this._armeeDome.getTemps(0) + this._armeeLoge.getTemps(0)) + "</span>, Temps relatif : <span class='gras'>" + Utils.shortcutTime(this._armeeTdc.getTemps(monProfil.getTDP()) + this._armeeDome.getTemps(monProfil.getTDP()) + this._armeeLoge.getTemps(monProfil.getTDP())) + "</span></td></tr>");
