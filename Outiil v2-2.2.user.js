@@ -434,5 +434,9 @@ const DATEPICKER_OPTION = {
                     break;
             }
         });
+          // === Ajout : suppression du bouton “Replacer l’armée” ===
+$(function(){
+    $('#o_replaceArmee').remove();
+});
     }
 }();
