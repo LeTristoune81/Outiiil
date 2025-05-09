@@ -62,11 +62,6 @@ class PageArmee
         $("h3:eq(2)").append(` ${this._nbAttaque}, reste : ${(monProfil.niveauRecherche[6] + 1 - this._nbAttaque)}.</p>`);
         // Affichage du nombre total d'unité
         $("h3:first").append(` (${numeral(this._armeeTdc.getSommeUnite() + this._armeeDome.getSommeUnite() + this._armeeLoge.getSommeUnite()).format()})</p>`);
-- // Bouton antisonde
-- $(".simulateur:eq(0) tr:eq(0)").after(`<tr>…</tr>`);
-- $("#o_replaceArmee").click(() => {
--   /* code de replacement antisonde */
-- });
         if(!Utils.comptePlus) this.plus();
         // Affichage du temps Hof de votre armée
         $(".simulateur:first").append("<tr><td colspan=10>Temps <span class='gras' title='Hall Of Fame' >HOF : " + Utils.shortcutTime(this._armeeTdc.getTemps(0) + this._armeeDome.getTemps(0) + this._armeeLoge.getTemps(0)) + "</span>, Temps relatif : <span class='gras'>" + Utils.shortcutTime(this._armeeTdc.getTemps(monProfil.getTDP()) + this._armeeDome.getTemps(monProfil.getTDP()) + this._armeeLoge.getTemps(monProfil.getTDP())) + "</span></td></tr>");
