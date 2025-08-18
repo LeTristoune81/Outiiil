@@ -5,7 +5,7 @@
 // Icône du bouton "Mise à jour" (ton image dans /images)
 const IMG_UPDATE = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/update.png";
 
-// URL RAW de ton userscript
+// URL RAW de ton userscript 
 const OUTIIIL_UPDATE_URL = "https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js";
 
 function o_openUpdate() {
