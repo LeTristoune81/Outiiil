@@ -2,10 +2,10 @@
 * Dock — Outiiil (bouton Update ajouté, Traceur/Carte retirés)
 */
 
-// Icône du bouton "Mise à jour" (image dédiée)
+// Icône “Mettre à jour”
 const IMG_UPDATE = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/update.png";
 
-// URL d’update du userscript (RAW @updateURL/@downloadURL)
+// Lien RAW vers ton userscript
 const OUTIIIL_UPDATE_URL = "https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js";
 
 function o_openUpdate() {
