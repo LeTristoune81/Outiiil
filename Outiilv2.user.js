@@ -240,7 +240,6 @@ const IMG_DEF = "<img src='images/icone/icone_degat_defense.gif' alt='Dégâts e
 const IMG_GAUCHE = "<img src='images/bouton/fleche-champs-gauche.gif' width='9' height='15' class='o_vAlign'/>";
 const IMG_DROITE = "<img src='images/bouton/fleche-champs-droite.gif' width='9' height='15' class='o_vAlign'/>";
 const IMG_COPY = "<img src='images/icone/feuille.gif' class='cliquable' title='Copier/Coller une armée' style='position:relative;top:3px' width='14' height='17'>";
-const OUTIIIL_UPDATE_URL = "https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js";
 
 // Image pour l'extension
 // const IMG_CHANGE      = OUTIIL_ROOT + 'images/change.png';
