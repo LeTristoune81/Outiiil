@@ -311,6 +311,3 @@ const DATEPICKER_OPTION = {
     });
   }
 }();
-
-// petite variable globale attendue par le code
-var monProfil = null;
