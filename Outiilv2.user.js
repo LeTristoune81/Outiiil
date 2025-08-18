@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Outiil v2
-// @version     2.2.5
+// @version     2.2.6
 // @author      Hraesvelg, modifié par White
 // @downloadURL  https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js
 // @updateURL    https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js
@@ -351,6 +351,62 @@ const DATEPICKER_OPTION = {
             // Ajout des outils
             let boite = new Dock();
             boite.afficher();
+            // === Bouton "Mettre à jour" (injection robuste) =====================
+const OUTIIIL_UPDATE_URL = "https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js";
+const IMG_UPDATE = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/update.png";
+
+function injectUpdateButton() {
+  const $toolbar = $("#o_toolbarOutiiil");
+  if (!$toolbar.length) { setTimeout(injectUpdateButton, 200); return; }
+
+  // déjà présent ? on ne duplique pas
+  if ($toolbar.find("#o_itemUpdate").length) return;
+
+  // Crée le bouton
+  const $btn = $(`
+    <div id="o_toolbarItemU" class="o_toolbarItem" title="Mettre à jour">
+      <span id="o_itemUpdate"
+            style="display:inline-block;width:28px;height:28px;
+                   background-image:url(${IMG_UPDATE});
+                   background-size:contain;background-position:center;background-repeat:no-repeat;"></span>
+    </div>`);
+
+  // Insère avant "Préférence" si présent, sinon à la fin
+  const $pref = $toolbar.find("#o_toolbarItem6");
+  if ($pref.length) $btn.insertBefore($pref); else $toolbar.append($btn);
+
+  // Tooltip sur le nouveau bouton (même style que les autres)
+  const optsDroite = {
+    tooltipClass : "warning-tooltip",
+    content : function(){return $(this).prop("title");},
+    position : {my : "left+10 center", at : "right center"},
+    hide : {effect: "fade", duration: 10}
+  };
+  const optsBas = {
+    tooltipClass : "warning-tooltip",
+    content : function(){return $(this).prop("title");},
+    position : {my : "center top", at : "center bottom+10"},
+    hide : {effect: "fade", duration: 10}
+  };
+  if (monProfil.parametre["dockPosition"].valeur == "1") {
+    $("#o_toolbarItemU").tooltip(optsBas);
+  } else {
+    $("#o_toolbarItemU").tooltip(optsDroite);
+  }
+
+  // Clic sur l’icône → ouvre l’URL RAW du userscript
+  $toolbar.off("click.o_update").on("click.o_update", "#o_itemUpdate", () => {
+    if (typeof GM_openInTab === "function") GM_openInTab(OUTIIIL_UPDATE_URL, { active:true, insert:true });
+    else window.open(OUTIIIL_UPDATE_URL, "_blank");
+  });
+}
+
+// Injection maintenant + réinjection si le Dock est régénéré
+injectUpdateButton();
+new MutationObserver(() => injectUpdateButton())
+  .observe(document.body, { childList:true, subtree:true });
+// ====================================================================
+
             // boite compte plus
             let boiteComptePlus = new BoiteComptePlus();
             boiteComptePlus.afficher();
