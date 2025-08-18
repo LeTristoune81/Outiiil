@@ -30,7 +30,11 @@ class Dock
     afficher()
     {
         $("body").append(this._html);
-
+// Sécurité : retirer Traceur & Carte même si un ancien HTML subsiste
+$("#o_toolbarOutiiil")
+  .find("#o_itemTraceur, #o_itemMap")
+  .closest(".o_toolbarItem")
+  .remove();
         $(".o_toolbarDroite .o_toolbarItem").tooltip({
             tooltipClass : "warning-tooltip",
             content : function(){return $(this).prop("title");},
