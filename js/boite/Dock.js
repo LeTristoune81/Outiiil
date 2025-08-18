@@ -9,33 +9,28 @@ class Dock
 {
     constructor()
     {
-        /**
-        * HTML de la barre d’outils (sans Traceur et Carte)
-        */
+        // HTML de la barre (sans Traceur ni Carte)
         this._html = `<div id="o_toolbarOutiiil" class="${monProfil.parametre["dockPosition"].valeur == "1" ? "o_toolbarBas" : "o_toolbarDroite"}" ${monProfil.parametre["dockVisible"].valeur == 1 ? "" : "style='display:none'"}>
             <div id="o_toolbarItem1" class="o_toolbarItem" title="Ponte"><span id="o_itemPonte" style="background-image: url(${IMG_SPRITE_MENU})"/></div>
             <div id="o_toolbarItem2" class="o_toolbarItem" title="Chasse"><span id="o_itemChasse" style="background-image: url(${IMG_SPRITE_MENU})"/></div>
             <div id="o_toolbarItem3" class="o_toolbarItem" title="Combat"><span id="o_itemCombat" style="background-image: url(${IMG_SPRITE_MENU})"/></div>
             <div id="o_toolbarItem6" class="o_toolbarItem" title="Préférence"><span id="o_itemParametre" style="background-image: url(${IMG_SPRITE_MENU})"/></div>
             </div>`;
-        /**
-        * Boîtes actives
-        */
+
+        // Boîtes actives uniquement
         this._boitePonte = new BoitePonte();
         this._boiteChasse = new BoiteChasse();
         this._boiteCombat = new BoiteCombat();
         this._boiteParametre = new BoiteParametre();
     }
 
-	/**
+    /**
     * Affiche la boite.
-    *
-    * @private
-    * @method afficher
     */
-	afficher()
-	{
+    afficher()
+    {
         $("body").append(this._html);
+
         $(".o_toolbarDroite .o_toolbarItem").tooltip({
             tooltipClass : "warning-tooltip",
             content : function(){return $(this).prop("title");},
@@ -49,6 +44,7 @@ class Dock
             hide : {effect: "fade", duration: 10}
         });
 
+        // Affichage au survol si dock masqué
         if(monProfil.parametre["dockVisible"].valeur == "0"){
             $(document).mousemove((e) => {
                 if(monProfil.parametre["dockPosition"].valeur == "1"){ // boite en bas
@@ -65,24 +61,24 @@ class Dock
             });
         }
 
-        // clic sur un item de la boîte
+        // Clic sur un item
         $(".o_toolbarItem").click((e) => {
             switch($(e.currentTarget).find("span").attr("id")){
-                case "o_itemPonte" :
+                case "o_itemPonte":
                     this._boitePonte.afficher();
                     break;
-                case "o_itemChasse" :
+                case "o_itemChasse":
                     this._boiteChasse.afficher();
                     break;
-                case "o_itemCombat" :
+                case "o_itemCombat":
                     this._boiteCombat.afficher();
                     break;
-                case "o_itemParametre" :
+                case "o_itemParametre":
                     this._boiteParametre.afficher();
                     break;
-                default :
+                default:
                     break;
             }
         });
-	}
+    }
 }
