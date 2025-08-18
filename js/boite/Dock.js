@@ -10,41 +10,23 @@ class Dock
     constructor()
     {
         /**
-        *
+        * HTML de la barre d’outils (sans Traceur et Carte)
         */
         this._html = `<div id="o_toolbarOutiiil" class="${monProfil.parametre["dockPosition"].valeur == "1" ? "o_toolbarBas" : "o_toolbarDroite"}" ${monProfil.parametre["dockVisible"].valeur == 1 ? "" : "style='display:none'"}>
             <div id="o_toolbarItem1" class="o_toolbarItem" title="Ponte"><span id="o_itemPonte" style="background-image: url(${IMG_SPRITE_MENU})"/></div>
             <div id="o_toolbarItem2" class="o_toolbarItem" title="Chasse"><span id="o_itemChasse" style="background-image: url(${IMG_SPRITE_MENU})"/></div>
             <div id="o_toolbarItem3" class="o_toolbarItem" title="Combat"><span id="o_itemCombat" style="background-image: url(${IMG_SPRITE_MENU})"/></div>
-            <div id="o_toolbarItem4" class="o_toolbarItem" title="Traceur"><span id="o_itemTraceur" style="background-image: url(${IMG_SPRITE_MENU})"/></div>
-            <div id="o_toolbarItem5" class="o_toolbarItem" title="Carte"><span id="o_itemMap" style="background-image: url(${IMG_SPRITE_MENU})"/></div>
             <div id="o_toolbarItem6" class="o_toolbarItem" title="Préférence"><span id="o_itemParametre" style="background-image: url(${IMG_SPRITE_MENU})"/></div>
             </div>`;
         /**
-        *
+        * Boîtes actives
         */
         this._boitePonte = new BoitePonte();
-        /**
-        *
-        */
         this._boiteChasse = new BoiteChasse();
-        /**
-        *
-        */
         this._boiteCombat = new BoiteCombat();
-        /**
-        *
-        */
-        this._boiteTraceur = new BoiteTraceur();
-        /**
-        *
-        */
-        this._boiteMap = new BoiteMap();
-        /**
-        *
-        */
         this._boiteParametre = new BoiteParametre();
     }
+
 	/**
     * Affiche la boite.
     *
@@ -66,7 +48,7 @@ class Dock
             position : {my : "center top", at : "center bottom+10"},
             hide : {effect: "fade", duration: 10}
         });
-        // selon la pref on cache l'element
+
         if(monProfil.parametre["dockVisible"].valeur == "0"){
             $(document).mousemove((e) => {
                 if(monProfil.parametre["dockPosition"].valeur == "1"){ // boite en bas
@@ -82,9 +64,9 @@ class Dock
                 }
             });
         }
-        // evenement sur le clic d'un item de la boite d'outil
+
+        // clic sur un item de la boîte
         $(".o_toolbarItem").click((e) => {
-            // affichage de la boite
             switch($(e.currentTarget).find("span").attr("id")){
                 case "o_itemPonte" :
                     this._boitePonte.afficher();
@@ -94,12 +76,6 @@ class Dock
                     break;
                 case "o_itemCombat" :
                     this._boiteCombat.afficher();
-                    break;
-                case "o_itemTraceur" :
-                    this._boiteTraceur.afficher();
-                    break;
-                case "o_itemMap" :
-                    this._boiteMap.afficher();
                     break;
                 case "o_itemParametre" :
                     this._boiteParametre.afficher();
