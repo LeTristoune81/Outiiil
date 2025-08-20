@@ -2,8 +2,8 @@
 // @name        Outiil v2
 // @version     2.2.4
 // @author      Hraesvelg, modifié par White
-// @downloadURL https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.use.user.js
-// @updateURL   https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.use.user.js
+// @downloadURL https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js
+// @updateURL   https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js
 // @description Outiil de Hraesvelg herbergé par Manitas voire ici pour les sources originales : https://github.com/Hraesvelg/Outiiil, existe aussi en extension Chrome
 // @match       http://*.fourmizzz.fr/*
 
