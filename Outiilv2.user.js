@@ -7,6 +7,7 @@
 // @description Outiil de Hraesvelg herbergé par Manitas voire ici pour les sources originales : https://github.com/Hraesvelg/Outiiil, existe aussi en extension Chrome
 // @match       http://*.fourmizzz.fr/*
 
+// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/ParseurTDC.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Boite.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Chasse.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Combat.js
