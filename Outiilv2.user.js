@@ -13,7 +13,7 @@
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Combat.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Commande.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/ComptePlus.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Dock.js
+// @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/boite/Dock.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Map.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Parametres.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Ponte.js
