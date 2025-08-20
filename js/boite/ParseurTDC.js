@@ -1,5 +1,5 @@
 /* Outiiil — Parseur Traceur TDC (ASCII Toolzzz, en-têtes centrés, Net vert/rouge)
- * Intégration Outiiil : pas de bouton flottant, API globale window.OutiiilTDC.{open,close,toggle,fill,parse}
+ * Intégration Outiiil : pas de bouton Dock ici ; API globale window.OutiiilTDC.{open,close,toggle,fill,parse}
  */
 (function(){
 'use strict';
