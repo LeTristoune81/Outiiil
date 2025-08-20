@@ -4,18 +4,19 @@
  * - Bouton "Parser TDC" (radar.png) => window.OutiiilTDC.toggle()
  * - Réinjection robuste via MutationObserver
  */
+
 "use strict";
 
 // ---------- Constantes images ----------
 const SPRITE_MENU_FALLBACK = "images/sprite_menu.png";
 const IMG_SPRITE = (typeof IMG_SPRITE_MENU !== "undefined" && IMG_SPRITE_MENU) ? IMG_SPRITE_MENU : SPRITE_MENU_FALLBACK;
 
-// Icône bouton "Mise à jour"
+// Icône bouton "Mise à jour" (tu peux garder l’existant si tu en as un autre)
 const IMG_UPDATE = (typeof IMG_UPDATE !== "undefined" && IMG_UPDATE) ? IMG_UPDATE
   : "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/update.png";
 
-// Icône bouton "Parser TDC"
-const IMG_RADAR  = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/radar.png"; // tu peux mettre "images/radar.png" si local
+// Icône bouton "Parser TDC" (local dans /images)
+const IMG_RADAR  = "images/radar.png";
 
 // ---------- URL Update ----------
 const OUTIIIL_UPDATE_URL = "https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js";
@@ -28,7 +29,7 @@ function o_openUpdate() {
   }
 }
 
-// ---------- Tooltips ----------
+// ---------- Helper tooltips ----------
 function o_tooltipOptionsDroite() {
   return {
     tooltipClass : "warning-tooltip",
@@ -88,7 +89,7 @@ function o_injectTdcButton($toolbar) {
                    background-size:contain;background-position:center;background-repeat:no-repeat;"></span>
     </div>`);
 
-  // placer avant "Préférence" (#o_toolbarItem6), sinon en fin
+  // placer avant "Préférence" si présent (#o_toolbarItem6), sinon en fin
   const $pref = $toolbar.find("#o_toolbarItem6");
   if ($pref.length) $pref.before($btn);
   else $toolbar.append($btn);
@@ -106,15 +107,17 @@ class Dock {
     const clsPos = o_isDockBas() ? "o_toolbarBas" : "o_toolbarDroite";
     const vis = o_isDockVisible() ? "" : "style='display:none'";
 
-    // Items "noyau"
+    // Items "noyau" (sprites menu)
     this._html = `
       <div id="o_toolbarOutiiil" class="${clsPos}" ${vis}>
         <div id="o_toolbarItem1" class="o_toolbarItem" title="Ponte">
           <span id="o_itemPonte" style="background-image:url(${IMG_SPRITE})"></span>
         </div>
+
         <div id="o_toolbarItem2" class="o_toolbarItem" title="Chasse">
           <span id="o_itemChasse" style="background-image:url(${IMG_SPRITE})"></span>
         </div>
+
         <div id="o_toolbarItem3" class="o_toolbarItem" title="Combat">
           <span id="o_itemCombat" style="background-image:url(${IMG_SPRITE})"></span>
         </div>
@@ -126,7 +129,7 @@ class Dock {
         </div>
       </div>`;
 
-    // Boîtes
+    // Boîtes gérées par Outiiil (déjà existantes)
     this._boitePonte      = new BoitePonte();
     this._boiteChasse     = new BoiteChasse();
     this._boiteCombat     = new BoiteCombat();
@@ -137,17 +140,18 @@ class Dock {
     $("body").append(this._html);
     const $toolbar = $("#o_toolbarOutiiil");
 
-    // Nettoyage anciens items si présents
+    // Nettoyage d’anciens items si présents
     $toolbar.find('.o_toolbarItem[title="Traceur"], .o_toolbarItem[title="Carte"], #o_itemTraceur, #o_itemMap')
             .closest(".o_toolbarItem").remove();
 
-    // Injection
+    // Injection des nouveaux items
     o_injectUpdateButton($toolbar);
     o_injectTdcButton($toolbar);
 
-    // Tooltips de base
+    // Tooltips de base pour les items existants (selon position)
     const optsDroite = o_tooltipOptionsDroite();
     const optsBas    = o_tooltipOptionsBas();
+
     $(".o_toolbarDroite .o_toolbarItem").tooltip(optsDroite);
     $(".o_toolbarBas .o_toolbarItem").tooltip(optsBas);
 
@@ -185,7 +189,7 @@ class Dock {
       }
     });
 
-    // Réinjection si la barre change
+    // Réinjection si la barre change (ex: re-render d’une boîte)
     const mo = new MutationObserver(() => {
       const $tb = $("#o_toolbarOutiiil");
       if (!$tb.length) return;
