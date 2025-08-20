@@ -85,6 +85,21 @@
         alert("Le parseur TDC n'est pas chargé (ParseurTDC.js).");
       }
     });
+// Tooltip stylé (optionnel) si jQuery UI est là
+if (window.$ && $.fn.tooltip) {
+  var $btn = $(btn);
+  var dockBas = false;
+  try { dockBas = (window.monProfil && monProfil.parametre["dockPosition"].valeur == "1"); } catch(e){}
+  var opts = {
+    tooltipClass : "warning-tooltip",
+    content : function(){ return $(this).prop("title"); },
+    position : dockBas
+      ? { my:"center top",  at:"center bottom+10" }
+      : { my:"left+10 center", at:"right center" },
+    hide : { effect:"fade", duration:10 }
+  };
+  $btn.tooltip(opts);
+}
 
     return true;
   }
