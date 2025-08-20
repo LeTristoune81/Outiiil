@@ -5,6 +5,9 @@
 // Icône du bouton "Mise à jour" (ton image dans /images)
 const IMG_UPDATE = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/update.png";
 
+// Icône du bouton "Parser TDC" (image dans /images)
+const IMG_RADAR  = "images/radar.png"; // ou CDN si tu préfères
+
 // URL RAW de ton userscript
 const OUTIIIL_UPDATE_URL = "https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js";
 
@@ -50,12 +53,50 @@ function o_injectUpdateButton($toolbar) {
     }
 }
 
+// Injecte le bouton Parser TDC (icône radar) dans la barre
+function o_injectTdcButton($toolbar) {
+    if (!$toolbar.length) return;
+    if ($toolbar.find("#o_itemTDC").length) return;
+
+    const $tdcBtn = $(`
+        <div id="o_toolbarItem5b" class="o_toolbarItem" title="Parser TDC">
+          <span id="o_itemTDC"
+                style="display:inline-block;width:28px;height:28px;
+                       background-image:url(${IMG_RADAR});
+                       background-size:contain;background-position:center;background-repeat:no-repeat;"></span>
+        </div>`);
+
+    // placer avant "Préférence" si présent, sinon à la fin
+    const $pref = $toolbar.find("#o_toolbarItem6");
+    if ($pref.length) $pref.before($tdcBtn);
+    else $toolbar.append($tdcBtn);
+
+    // tooltips cohérents avec la position du dock
+    const optsDroite = {
+        tooltipClass : "warning-tooltip",
+        content : function(){return $(this).prop("title");},
+        position : {my : "left+10 center", at : "right center"},
+        hide : {effect: "fade", duration: 10}
+    };
+    const optsBas = {
+        tooltipClass : "warning-tooltip",
+        content : function(){return $(this).prop("title");},
+        position : {my : "center top", at : "center bottom+10"},
+        hide : {effect: "fade", duration: 10}
+    };
+    if (monProfil?.parametre?.["dockPosition"]?.valeur == "1") {
+        $("#o_toolbarItem5b").tooltip(optsBas);
+    } else {
+        $("#o_toolbarItem5b").tooltip(optsDroite);
+    }
+}
+
 /**
 * Classe pour la gestion des différents outils globals à fourmizzz.
 */
 class Dock {
     constructor() {
-        // Barre : Ponte, Chasse, Combat, (Update injecté ensuite), Préférence
+        // Barre : Ponte, Chasse, Combat, (Update/TDC injectés ensuite), Préférence
         this._html = `<div id="o_toolbarOutiiil" class="${
             monProfil.parametre["dockPosition"].valeur == "1" ? "o_toolbarBas" : "o_toolbarDroite"
         }" ${monProfil.parametre["dockVisible"].valeur == 1 ? "" : "style='display:none'"}>
@@ -93,8 +134,9 @@ class Dock {
         $toolbar.find('.o_toolbarItem[title="Traceur"], .o_toolbarItem[title="Carte"], #o_itemTraceur, #o_itemMap')
                 .closest(".o_toolbarItem").remove();
 
-        // 2) Injecter le bouton Update maintenant
+        // 2) Injecter les nouveaux boutons maintenant
         o_injectUpdateButton($toolbar);
+        o_injectTdcButton($toolbar);
 
         // 3) Re-injecter si la barre est re-générée plus tard (MutationObserver)
         const mo = new MutationObserver(() => {
@@ -103,6 +145,7 @@ class Dock {
                 $tb.find('.o_toolbarItem[title="Traceur"], .o_toolbarItem[title="Carte"], #o_itemTraceur, #o_itemMap')
                    .closest(".o_toolbarItem").remove();
                 o_injectUpdateButton($tb);
+                o_injectTdcButton($tb);
             }
         });
         mo.observe(document.body, { childList: true, subtree: true });
@@ -141,6 +184,14 @@ class Dock {
                 case "o_itemChasse":     this._boiteChasse.afficher(); break;
                 case "o_itemCombat":     this._boiteCombat.afficher(); break;
                 case "o_itemUpdate":     o_openUpdate(); break;
+                case "o_itemTDC":
+                    if (window.OutiiilTDC && typeof window.OutiiilTDC.toggle === "function") {
+                        window.OutiiilTDC.toggle();
+                    } else {
+                        console.warn("[Outiiil] Parser TDC introuvable (window.OutiiilTDC).");
+                        alert("Le parseur TDC (ParseurTDC.js) n'est pas chargé.");
+                    }
+                    break;
                 case "o_itemParametre":  this._boiteParametre.afficher(); break;
                 default: break;
             }
