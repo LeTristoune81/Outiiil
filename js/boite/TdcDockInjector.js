@@ -1,41 +1,44 @@
-/* Outiiil — Injecteur bouton "Parser TDC" dans le dock (sprite)
+/* Outiiil — Injecteur bouton "Parser TDC" (sprite, clone complet)
    - N'altère pas Dock.js
-   - Utilise sprite_menu.png + position exacte fournie
+   - Clone l'icône d'un bouton existant (image, taille, background-size)
+   - Applique ta position: -0px -240px
 */
 (function(){
   'use strict';
 
-  // === CONFIG ===
-  // 1) Sprite du dock (reprend la constante si dispo, sinon fallback local)
-  var SPRITE_URL =
-    (typeof window.IMG_SPRITE_MENU !== 'undefined' && window.IMG_SPRITE_MENU)
-      ? window.IMG_SPRITE_MENU
-      : 'images/sprite_menu.png';
+  // Position exacte dans le sprite (fournie)
+  var SPRITE_POSITION = "-0px -240px";
 
-  // 2) Position exacte dans le sprite (ta valeur)
-  var SPRITE_POSITION = "-0px -240px";  // ✅ ton offset
-
-  // === Helpers ===
   function findToolbar(){ return document.getElementById('o_toolbarOutiiil'); }
-  function firstIconSpan(){
-    var s = document.querySelector('#o_toolbarOutiiil .o_toolbarItem span');
-    if (!s) s = document.querySelector('.o_toolbarItem span');
-    return s;
-  }
-  function detectTileSize(){
-    // copie width/height/background-size d’une icône existante
-    var ref = firstIconSpan();
-    var w = 28, h = 28, bgs = '';
-    if (ref) {
-      var cs = getComputedStyle(ref);
-      w = parseInt(cs.width, 10) || w;
-      h = parseInt(cs.height, 10) || h;
-      bgs = cs.backgroundSize; // si défini, on le recopie
+
+  // trouve une icône de référence qui a déjà le bon sprite chargé
+  function findRefIcon(){
+    // essaie des IDs connus
+    var ids = ['#o_itemPonte', '#o_itemChasse', '#o_itemCombat', '#o_itemParametre'];
+    for (var i=0;i<ids.length;i++){
+      var el = document.querySelector(ids[i]);
+      if (el) return el;
     }
-    return {w:w, h:h, bgs:bgs};
+    // sinon, le premier span d'item avec un background défini
+    var spans = document.querySelectorAll('#o_toolbarOutiiil .o_toolbarItem span, .o_toolbarItem span');
+    for (var j=0;j<spans.length;j++){
+      var cs = getComputedStyle(spans[j]);
+      if (cs.backgroundImage && cs.backgroundImage !== 'none') return spans[j];
+    }
+    return null;
   }
 
-  function makeButton(){
+  function readBackground(el){
+    var cs = getComputedStyle(el);
+    // ex: url("https://.../sprite_menu.png")
+    var bg = cs.backgroundImage && cs.backgroundImage !== 'none' ? cs.backgroundImage : '';
+    var w  = parseInt(cs.width, 10)  || 28;
+    var h  = parseInt(cs.height, 10) || 28;
+    var bgs = cs.backgroundSize; // peut être "auto auto" ou une valeur (on la recopie telle quelle)
+    return {bg:bg,w:w,h:h,bgs:bgs};
+  }
+
+  function makeButton(refSpan){
     var wrap = document.createElement('div');
     wrap.className = 'o_toolbarItem';
     wrap.title = 'Parser TDC';
@@ -44,13 +47,13 @@
     span.id = 'o_itemTDC';
     wrap.appendChild(span);
 
-    var ref = detectTileSize();
+    // clone image + taille depuis la ref
+    var ref = readBackground(refSpan);
+    if (ref.bg) span.style.backgroundImage = ref.bg;
     span.style.display = 'inline-block';
     span.style.width   = ref.w + 'px';
     span.style.height  = ref.h + 'px';
-    span.style.backgroundImage    = 'url("'+SPRITE_URL+'")';
     span.style.backgroundRepeat   = 'no-repeat';
-    // position précise fournie
     span.style.backgroundPosition = SPRITE_POSITION;
     if (ref.bgs && ref.bgs !== 'auto' && ref.bgs !== 'auto auto') {
       span.style.backgroundSize = ref.bgs;
@@ -60,9 +63,12 @@
 
   function injectOnce(toolbar){
     if (!toolbar) return false;
-    if (toolbar.querySelector('#o_itemTDC')) return true; // déjà injecté
+    if (toolbar.querySelector('#o_itemTDC')) return true; // déjà présent
 
-    var btn = makeButton();
+    var ref = findRefIcon();
+    if (!ref) return false; // attend qu'une icône du dock soit prête (sprite chargé)
+
+    var btn = makeButton(ref);
     var pref = toolbar.querySelector('#o_toolbarItem6'); // “Préférence”
     if (pref && pref.parentElement === toolbar) {
       toolbar.insertBefore(btn, pref);
@@ -87,15 +93,21 @@
     var tries = 0, maxTries = 200; // ~20s
     var iv = setInterval(function(){
       var bar = findToolbar();
-      if (bar && injectOnce(bar)) {
+      if (!bar){ if(++tries > maxTries) clearInterval(iv); return; }
+
+      // attend qu'au moins une icône ait un background-image résolu
+      var ok = injectOnce(bar);
+      if (ok){
         clearInterval(iv);
+        // réinjection si le dock change
         var mo = new MutationObserver(function(){
           var b = findToolbar();
           if (b) injectOnce(b);
         });
         mo.observe(document.body, {childList:true, subtree:true});
+      } else {
+        if(++tries > maxTries) clearInterval(iv);
       }
-      if (++tries > maxTries) clearInterval(iv);
     }, 100);
   }
 
