@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Outiil v2
-// @version     2.2.2
+// @version     2.2.3
 // @author      Hraesvelg, modifié par White
 // @downloadURL https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiil%20v2-2.2.1.user.js
 // @updateURL   https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiil%20v2-2.2.1.user.js
@@ -8,12 +8,12 @@
 // @match       http://*.fourmizzz.fr/*
 
 // @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/boite/ParseurTDC.js
+// @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/boite/Dock.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Boite.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Chasse.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Combat.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Commande.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/ComptePlus.js
-// @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/boite/Dock.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Map.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Parametres.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Ponte.js
