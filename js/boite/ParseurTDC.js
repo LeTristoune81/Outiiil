@@ -134,6 +134,115 @@ const toggle = ()=>$('#panel').classList.toggle('show');
 $('#close').addEventListener('click',toggle);
 window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T')){ e.preventDefault(); toggle(); }});
 
+/* ===== Fenêtre déplaçable + position persistée (drag) ===== */
+(() => {
+  const POS_KEY = 'OutiiilTDC:pos';
+
+  // Récupère le root à utiliser: shadow root si dispo, sinon document
+  const root = (typeof shadow !== 'undefined' && shadow && typeof shadow.querySelector === 'function')
+    ? shadow
+    : document;
+
+  const panelEl  = root.querySelector('#panel');
+  const headerEl = root.querySelector('.hdr');
+  if (!panelEl || !headerEl) return; // UI pas encore montée
+
+  // Indice visuel
+  headerEl.style.cursor = 'move';
+
+  // --------- Persistance / contraintes écran ----------
+  function clampIntoViewport() {
+    const rect = panelEl.getBoundingClientRect();
+    const W = window.innerWidth, H = window.innerHeight;
+    const maxL = Math.max(0, W - rect.width);
+    const maxT = Math.max(0, H - rect.height);
+    if (panelEl.style.left) {
+      let L = Math.min(Math.max(0, parseInt(panelEl.style.left || '0', 10)), maxL);
+      let T = Math.min(Math.max(0, parseInt(panelEl.style.top  || '0', 10)), maxT);
+      panelEl.style.left = L + 'px';
+      panelEl.style.top  = T + 'px';
+      savePos();
+    }
+  }
+  function loadPos() {
+    try {
+      const s = localStorage.getItem(POS_KEY);
+      if (!s) return false;
+      const { left, top } = JSON.parse(s) || {};
+      if (Number.isFinite(left) && Number.isFinite(top)) {
+        panelEl.style.right  = 'auto';
+        panelEl.style.bottom = 'auto';
+        panelEl.style.left   = left + 'px';
+        panelEl.style.top    = top  + 'px';
+        clampIntoViewport();
+        return true;
+      }
+    } catch(e) {}
+    return false;
+  }
+  function savePos() {
+    const L = parseInt(panelEl.style.left, 10);
+    const T = parseInt(panelEl.style.top, 10);
+    if (Number.isFinite(L) && Number.isFinite(T)) {
+      localStorage.setItem(POS_KEY, JSON.stringify({ left: L, top: T }));
+    }
+  }
+  function resetPosBottomRight() {
+    localStorage.removeItem(POS_KEY);
+    panelEl.style.left = '';
+    panelEl.style.top  = '';
+    panelEl.style.right  = '18px';
+    panelEl.style.bottom = '18px';
+  }
+
+  // --------- Drag & drop sur l’entête ----------
+  let dragging = false, offsetX = 0, offsetY = 0;
+
+  headerEl.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return; // seulement clic gauche
+    dragging = true;
+    const r = panelEl.getBoundingClientRect();
+    offsetX = e.clientX - r.left;
+    offsetY = e.clientY - r.top;
+    // passe en positionnement left/top
+    panelEl.style.right  = 'auto';
+    panelEl.style.bottom = 'auto';
+    headerEl.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    let left = e.clientX - offsetX;
+    let top  = e.clientY - offsetY;
+    const W = window.innerWidth, H = window.innerHeight;
+    left = Math.max(0, Math.min(left, W - panelEl.offsetWidth));
+    top  = Math.max(0, Math.min(top,  H - panelEl.offsetHeight));
+    panelEl.style.left = left + 'px';
+    panelEl.style.top  = top  + 'px';
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    headerEl.style.cursor = 'move';
+    savePos();
+  });
+
+  // Double-clic sur l’entête → reset en bas/droite
+  headerEl.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    resetPosBottomRight();
+  });
+
+  // Recalage si la fenêtre change de taille
+  window.addEventListener('resize', clampIntoViewport);
+
+  // Au chargement du script : essaie d’appliquer la position mémorisée
+  loadPos();
+})();
+
+
 /* ==================== Events ==================== */
 $('#clear').addEventListener('click',()=>{$('#raw').value=''; setStatus(''); clearTables(); disableCopy();});
 $('#sample').addEventListener('click',()=>$('#raw').value=SAMPLE.trim());
