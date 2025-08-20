@@ -8,6 +8,7 @@
 // @match       http://*.fourmizzz.fr/*
 
 // @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/boite/ParseurTDC.js
+// @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/boite/TdcDockInjector.js
 // @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/boite/Dock.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Boite.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Chasse.js
