@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name        Outiil v2
-// @version     2.3
+// @version     2.3.1
 // @author      Hraesvelg, modifié par White
 // @downloadURL https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js
 // @updateURL   https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js
 // @description Outiil de Hraesvelg herbergé par Manitas voire ici pour les sources originales : https://github.com/Hraesvelg/Outiiil, existe aussi en extension Chrome
 // @match       http://*.fourmizzz.fr/*
+// @grant       GM_setClipboard
 
 // @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/boite/ParseurTDC.js
 // @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/boite/TdcDockInjector.js
@@ -51,6 +52,7 @@
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/numeral_2.0.6.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/numeral-locale-fr.js
 
+// @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/page/MessagerieExport.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Alliance.js
 // @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/page/Armee.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Attaquer.js
