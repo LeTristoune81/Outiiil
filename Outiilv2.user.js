@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Outiil v2
-// @version     2.3
+// @version     2.3.2
 // @author      Hraesvelg, modifié par White
 // @downloadURL https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js
 // @updateURL   https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js
