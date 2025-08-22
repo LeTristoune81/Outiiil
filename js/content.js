@@ -161,30 +161,30 @@ const LISTESMILEY6       = `<img src='images/carte/rien.gif' width='1' height='3
        <img src='images/smiley/panic.gif' onclick='addRaccourciSmiley("message","panic")'>
        <img src='images/smiley/dog.gif' onclick='addRaccourciSmiley("message","dog")'>
        <img src='images/smiley/plane.gif' onclick='addRaccourciSmiley("message","plane")'>`;
-// Image diverses de fourmizzz
-const IMG_FLECHE         = "<img src='images/icone/fleche-bas-claire.png' style='vertical-align:1px;' alt='changer' height='8'>";
-const IMG_POMME          = "<img src='images/icone/icone_pomme.gif' alt='Nourriture' class='o_vAlign' height='18' title='Consommation Journalière' />";
-const IMG_MAT            = "<img src='images/icone/icone_bois.gif' alt='Materiaux' height='18'/>";
-const IMG_VIE            = "<img src='images/icone/icone_coeur.gif' class='o_vAlign' height='18' width='18'/>";
-const IMG_ATT            = "<img src='images/icone/icone_degat_attaque.gif'  alt='Dégâts en attaque :' class='o_vAlign'height='18' title='Dégâts en attaque :' />";
-const IMG_DEF            = "<img src='images/icone/icone_degat_defense.gif' alt='Dégâts en défense :' class='o_vAlign' height='18' title='Dégâts en défense :' />";
-const IMG_GAUCHE         = "<img src='images/bouton/fleche-champs-gauche.gif' width='9' height='15' class='o_vAlign'/>";
-const IMG_DROITE         = "<img src='images/bouton/fleche-champs-droite.gif' width='9' height='15' class='o_vAlign'/>";
-const IMG_COPY           = "<img src='images/icone/feuille.gif' class='cliquable' title='Copier/Coller une armée' style='position:relative;top:3px' width='14' height='17'>";
-// Image pour l'extension
-const IMG_CHANGE         = chrome.extension.getURL("images/change.png");
-const IMG_ACTUALISER     = chrome.extension.getURL("images/actualize_on_01.png");
-const IMG_CRAYON	     = chrome.extension.getURL("images/crayon.gif");
-const IMG_CROIX			 = chrome.extension.getURL("images/croix.png");
-const IMG_COPIER		 = chrome.extension.getURL("images/copy.png");
-const IMG_HISTORIQUE	 = chrome.extension.getURL("images/historique.png");
-const IMG_LIVRAISON		 = chrome.extension.getURL("images/livraison.png");
-const IMG_RADAR			 = chrome.extension.getURL("images/radar.png");
-const IMG_SPRITE_MENU	 = chrome.extension.getURL("images/sprite_menu.png");
-const IMG_UTILITY		 = chrome.extension.getURL("images/utility.png");
-const IMG_DOWN			 = chrome.extension.getURL("images/down.png");
-const IMG_UP			 = chrome.extension.getURL("images/up.png");
-const IMG_OUTIIIL		 = chrome.extension.getURL("images/outiiil.png");
+// Images diverses de fourmizzz via jsDelivr
+const IMG_FLECHE      = `<img src="${OUTIIL_ROOT}images/icone/fleche-bas-claire.png" style="vertical-align:1px;" alt="changer" height="8">`;
+const IMG_POMME       = `<img src="${OUTIIL_ROOT}images/icone/icone_pomme.gif" alt="Nourriture" class="o_vAlign" height="18" title="Consommation Journalière" />`;
+const IMG_MAT         = `<img src="${OUTIIL_ROOT}images/icone/icone_bois.gif" alt="Matériaux" height="18"/>`;
+const IMG_VIE         = `<img src="${OUTIIL_ROOT}images/icone/icone_coeur.gif" class="o_vAlign" height="18" width="18"/>`;
+const IMG_ATT         = `<img src="${OUTIIL_ROOT}images/icone/icone_degat_attaque.gif" alt="Dégâts en attaque :" class="o_vAlign" height="18" title="Dégâts en attaque :" />`;
+const IMG_DEF         = `<img src="${OUTIIL_ROOT}images/icone/icone_degat_defense.gif" alt="Dégâts en défense :" class="o_vAlign" height="18" title="Dégâts en défense :" />`;
+const IMG_GAUCHE      = `<img src="${OUTIIL_ROOT}images/bouton/fleche-champs-gauche.gif" width="9" height="15" class="o_vAlign"/>`;
+const IMG_DROITE      = `<img src="${OUTIIL_ROOT}images/bouton/fleche-champs-droite.gif" width="9" height="15" class="o_vAlign"/>`;
+const IMG_COPY        = `<img src="${OUTIIL_ROOT}images/icone/feuille.gif" class="cliquable" title="Copier/Coller une armée" style="position:relative;top:3px" width="14" height="17"/>`;
+// Images spécifiques Outiiil
+const IMG_CHANGE      = OUTIIL_ROOT + 'images/change.png';
+const IMG_ACTUALISER  = OUTIIL_ROOT + 'images/actualize_on_01.png';
+const IMG_CRAYON      = OUTIIL_ROOT + 'images/crayon.gif';
+const IMG_CROIX       = OUTIIL_ROOT + 'images/croix.png';
+const IMG_COPIER      = OUTIIL_ROOT + 'images/copy.png';
+const IMG_HISTORIQUE  = OUTIIL_ROOT + 'images/historique.png';
+const IMG_LIVRAISON   = OUTIIL_ROOT + 'images/livraison.png';
+const IMG_RADAR       = OUTIIL_ROOT + 'images/radar.png';
+const IMG_SPRITE_MENU = OUTIIL_ROOT + 'images/sprite_menu.png';
+const IMG_UTILITY     = OUTIIL_ROOT + 'images/utility.png';
+const IMG_DOWN        = OUTIIL_ROOT + 'images/down.png';
+const IMG_UP          = OUTIIL_ROOT + 'images/up.png';
+const IMG_OUTIIIL     = OUTIIL_ROOT + 'images/outiiil.png';
 
 const TOAST_ERROR        = {heading : "Erreur", hideAfter: 3500, showHideTransition : "slide", position: {top : 30, right : 100}, icon : "error"};
 const TOAST_SUCCESS      = {heading : "Succès", hideAfter: 3500, showHideTransition : "slide", position: {top : 30, right : 100}, icon : "success"};
