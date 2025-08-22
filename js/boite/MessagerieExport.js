@@ -1,42 +1,40 @@
 // js/boite/MessagerieExport.js
-(function (w, d) {
+(function (g) {
   'use strict';
 
-  // ---------------- CSS (sans GM_addStyle) ----------------
-  const CSS = `
-    .zz-btn { background:#428bca; border:1px solid #357ebd; color:#fff; border-radius:4px; padding:6px 12px;
-              font-size:14px; cursor:pointer; transition:background .2s; }
-    .zz-btn:hover { background:#3071a9; }
-    .zz-export { display:none; margin:16px auto; max-width:1100px; }
-    .zz-export.visible { display:block; }
-    .zz-actions { margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-    .zz-mini { background:#5cb85c; border:1px solid #4cae4c; color:#fff; border-radius:4px; padding:6px 10px; cursor:pointer; }
-    .zz-mini:hover { background:#449d44; }
-    .zz-block { margin-bottom:20px; }
-    .zz-block textarea { width:100%; height:170px; font-family:monospace; white-space:pre-wrap; }
-  `;
+  // ---------- CSS (remplace GM_addStyle) ----------
   function ensureStyle() {
-    if (!d.getElementById('zz-mexp-style')) {
-      const s = d.createElement('style');
-      s.id = 'zz-mexp-style';
-      s.textContent = CSS;
-      d.head.appendChild(s);
-    }
+    if (document.getElementById('zz-export-style')) return;
+    const css = `
+      .zz-btn { background:#428bca; border:1px solid #357ebd; color:#fff; border-radius:4px; padding:6px 12px;
+                font-size:14px; cursor:pointer; transition:background .2s; }
+      .zz-btn:hover { background:#3071a9; }
+      .zz-export { display:none; margin:16px auto; max-width:1100px; }
+      .zz-export.visible { display:block; }
+      .zz-actions { margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap; }
+      .zz-mini { background:#5cb85c; border:1px solid #4cae4c; color:#fff; border-radius:4px; padding:6px 10px; cursor:pointer; }
+      .zz-mini:hover { background:#449d44; }
+      .zz-block { margin-bottom:20px; }
+      .zz-block textarea { width:100%; height:170px; font-family:monospace; white-space:pre-wrap; }
+    `;
+    const st = document.createElement('style');
+    st.id = 'zz-export-style';
+    st.textContent = css;
+    document.head.appendChild(st);
   }
 
-  // ---------------- Utilitaires ----------------
-  const $  = (sel, root=d) => root.querySelector(sel);
-  const $$ = (sel, root=d) => Array.from(root.querySelectorAll(sel));
+  // ---------- Helpers ----------
+  const $  = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const getPseudoFromHref = href => {
+    try { const u = new URL(href, location.href); return decodeURIComponent(u.searchParams.get('Pseudo')||''); }
+    catch { const m=/[?&]Pseudo=([^&]+)/.exec(href||''); return m?decodeURIComponent(m[1]):''; }
+  };
   const DATE_PREFIX_RE = /^\s*(?:\d{1,2}\/\d{1,2}\/\d{2}\s+à\s+\d{1,2}h\d{2}|(?:lun|mar|mer|jeu|ven|sam|dim|hier|aujourd'hui)\s+\d{1,2}h\d{2}|\d{1,2}h\d{2})\s*/i;
   const SYS_ACTION_RE  = /(a\s+(?:quitté|rejoint)\s+la conversation|a\s+(?:été\s+)?(?:ajouté|exclu|retiré)(?:e)?(?:\s+\w+)*\s+(?:de|à)\s+la conversation)\b/i;
 
-  function getPseudoFromHref(href) {
-    try { const u = new URL(href, location.href); return decodeURIComponent(u.searchParams.get('Pseudo')||''); }
-    catch { const m=/[?&]Pseudo=([^&]+)/.exec(href||''); return m?decodeURIComponent(m[1]):''; }
-  }
-
-  // HTML → BBCode (version Fzzz compatible)
+  // ---------- Conversions ----------
   function ze_HTML_to_BBcode(html, fourmizzz) {
     html = String(html).replace(/\n/g, '');
     if (fourmizzz) {
@@ -58,8 +56,6 @@
                .replace(/<div[^>]*align="center"[^>]*>([\s\S]*?)<\/div>/g, '[center]$1[/center]')
                .replace(/</g, '[').replace(/>/g, ']');
   }
-
-  // HTML -> Markdown (Discord)
   function htmlToMarkdown(html) {
     return String(html || '')
       .replace(/<div class="date_envoi">[\s\S]*?<\/div>/gi, '')
@@ -78,10 +74,10 @@
       .trim();
   }
 
+  // ---------- Parsing ----------
   function detectAuthor(tr) {
     let a = tr.querySelector('td.expe a[href*="Membre.php?Pseudo="]');
     if (a) return getPseudoFromHref(a.getAttribute('href')) || a.textContent.trim();
-
     a = tr.querySelector('td.message a[href*="Membre.php?Pseudo="]');
     if (a) return getPseudoFromHref(a.getAttribute('href')) || a.textContent.trim();
 
@@ -95,13 +91,11 @@
     if (expe && !/\d{1,2}h\d{2}/.test(expe)) return expe;
     return '';
   }
-
   function getConversationTitle(table) {
     const contentTR = table.closest('tr.contenu_conversation');
     let row = contentTR ? contentTR.previousElementSibling : null;
     const pick = el => el && el.textContent ? el.textContent.trim() : '';
     const SEL = '.intitule_message, .intitule, .titre_message, .titre, .title, .objet, .objet_message, .nom_conversation, .libelle_conversation, a.intitule_message, b, strong';
-
     if (row) {
       let el = row.querySelector(SEL);
       if (pick(el)) return pick(el);
@@ -120,7 +114,6 @@
     }
     return 'Sans Objet';
   }
-
   function findParticipantsCell(table) {
     const contentTR = table.closest('tr.contenu_conversation');
     let row = contentTR ? contentTR.previousElementSibling : null;
@@ -130,19 +123,16 @@
     }
     return table.closest('table')?.querySelector('td[id^="liste_participants_"]') || null;
   }
-
   async function ensureAllParticipantsShown(cell) {
     const t = cell?.querySelector('a.afficher_tous_participants');
     if (t) { t.click(); await sleep(150); }
   }
-
   function readParticipantsFromCell(cell) {
     if (!cell) return [];
     const links = $$('a[href*="Membre.php?Pseudo="]', cell);
     const names = links.map(a => getPseudoFromHref(a.getAttribute('href')) || a.textContent.trim()).filter(Boolean);
     return [...new Set(names)];
   }
-
   function readParticipantsFromMessages(table) {
     const rows = $$('tr[id^="message_"]', table).filter(tr => !tr.id.includes('complet'));
     const names = rows.map(tr => {
@@ -151,7 +141,6 @@
     }).filter(Boolean);
     return [...new Set(names)];
   }
-
   async function clickAllVoirPrec(table) {
     let btn;
     while ((btn = $$('a', table).find(a => /voir les messages pr[ée]c[ée]dents/i.test(a.textContent)))) {
@@ -159,40 +148,23 @@
     }
   }
 
+  // ---------- UI ----------
   function makeCopyBtn(ta, label) {
-    const b = d.createElement('button');
+    const b = document.createElement('button');
     b.className = 'zz-mini'; b.textContent = label;
     b.onclick = () => {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(ta.value).catch(()=>{ ta.select(); document.execCommand('copy'); });
-      } else { ta.select(); document.execCommand('copy'); }
+      if (typeof g.GM_setClipboard === 'function') g.GM_setClipboard(ta.value, { type:'text', mimetype:'text/plain' });
+      else { ta.select(); document.execCommand('copy'); }
     };
     return b;
   }
-
-  // ---------------- Détection des tableaux de conversation ----------------
-  const seen = new WeakSet();
-
-  function getConvTables() {
-    const set = new Set();
-    // Structure native
-    $$('tr.contenu_conversation td > table').forEach(t => set.add(t));
-    // Fallback : n'importe quel tableau qui contient des lignes message
-    $$('tr[id^="message_"]').forEach(tr => { const t = tr.closest('table'); if (t) set.add(t); });
-    return Array.from(set);
-  }
-
   function inject(table) {
-    if (seen.has(table)) return;
-    seen.add(table);
-
-    // bouton déjà injecté ?
-    if (table.querySelector('.zz-btn')) return;
+    if (table.__zzInjected) return; table.__zzInjected = true;
 
     const rBtn = table.insertRow(-1), cBtn = rBtn.insertCell(0);
     cBtn.colSpan = table.rows[0]?.cells.length || 2;
     cBtn.style.textAlign = 'center';
-    const btn = Object.assign(d.createElement('button'), { className:'zz-btn', textContent:'Exporter la conversation' });
+    const btn = Object.assign(document.createElement('button'), { className:'zz-btn', textContent:'Exporter la conversation' });
     cBtn.appendChild(btn);
 
     const rExp = table.insertRow(-1), cExp = rExp.insertCell(0);
@@ -204,19 +176,18 @@
         <div class="zz-block"><strong>Avec BBCode (Fourmizzz)</strong><textarea class="ta-fz" readonly></textarea></div>
         <div class="zz-block"><strong>Markdown (Discord)</strong><textarea class="ta-md" readonly></textarea></div>
       </div>`;
-    const exp   = $('.zz-export', cExp);
+    const exp = $('.zz-export', cExp);
     const taRaw = $('.ta-raw', exp), taFZ = $('.ta-fz', exp), taMD = $('.ta-md', exp);
     const actions = $('.zz-actions', exp);
     actions.append(
       makeCopyBtn(taRaw, 'Copier Texte'),
-      makeCopyBtn(taFZ,  'Copier BBCode Fzzz'),
-      makeCopyBtn(taMD,  'Copier Markdown')
+      makeCopyBtn(taFZ, 'Copier BBCode Fzzz'),
+      makeCopyBtn(taMD, 'Copier Markdown')
     );
 
     btn.onclick = async () => {
       await clickAllVoirPrec(table);
 
-      // Objet + Participants
       const titre = getConversationTitle(table);
       let partsCell = findParticipantsCell(table);
       await ensureAllParticipantsShown(partsCell);
@@ -226,20 +197,17 @@
       const partsRaw = participants.join(', ');
       const partsFZ  = participants.map(p => `[player]${p}[/player]`).join(', ');
 
-      // En-têtes
       let raw = `Objet : ${titre}\n\nParticipants : ${partsRaw}\n\n`;
       let fz  = `[center][b]${titre}[/b][/center]\n\nParticipants : ${partsFZ}\n\n`;
       let md  = `# ${titre}\n\nParticipants : ${partsRaw}\n\n`;
 
-      // Messages (ignorer *_complet)
       const rows = $$('tr[id^="message_"]', table).filter(tr => !tr.id.includes('complet'));
-
       rows.forEach(tr => {
-        const date   = tr.querySelector('.date_envoi')?.textContent.trim() || '';
+        const date = tr.querySelector('.date_envoi')?.textContent.trim() || '';
         const author = detectAuthor(tr) || 'Système';
 
         const id = tr.id.replace('message_', '');
-        const htmlSrc = (d.getElementById('message_complet_'+id)?.innerHTML || $('.message', tr)?.innerHTML || '');
+        const htmlSrc = ($('#message_complet_'+id)?.innerHTML || $('.message', tr)?.innerHTML || '');
         const html = htmlSrc.replace(/<div class="date_envoi">[\s\S]*?<\/div>/g, '');
         const text = ($('.message', tr)?.innerText || '').trim();
 
@@ -264,21 +232,21 @@
       exp.classList.add('visible');
     };
   }
-
   function scan() {
-    getConvTables().forEach(inject);
+    $$('tr.contenu_conversation td > table').forEach(inject);
+    new MutationObserver(() => $$('tr.contenu_conversation td > table').forEach(inject))
+      .observe(document.body, { childList:true, subtree:true });
   }
 
+  // ---------- API ----------
+  let booted = false;
   function boot() {
+    if (booted) return;
+    booted = true;
     console.log('[MessagerieExport] boot OK');
     ensureStyle();
     scan();
-    // Continue à écouter les mises à jour de la messagerie
-    new MutationObserver(scan).observe(d.body, { childList:true, subtree:true });
   }
 
-  // Expose une API simple pour le main
-  w.BoiteMessagerieExport = { boot, init: boot };
-
-  // On n’auto-boot PAS ici pour laisser le main décider (après PageMessagerie.executer()).
-})(window, document);
+  g.BoiteMessagerieExport = { boot };
+})(window);
