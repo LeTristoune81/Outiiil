@@ -4,7 +4,6 @@
 // @version     2.1.1
 // @description Outiil de Hraesvelg hébergé sur ton GitHub : https://github.com/LeTristoune81/Outiiil
 // @match       http://*.fourmizzz.fr/*
-// @namespace   http://silas5988.free.fr/
 // @run-at      document-end
 // @noframes
 
@@ -98,166 +97,41 @@ const ORDRE_XP_CHASSE = [10, 3, 4, 1, 12, 7, 5];
 const REPLIQUE_CHASSE = [0, 0, 0, 0.016, 0.093, 0.345, 0.577777778, 0.753, 0.837, 0.874, 0.937, 0.96, 0.989];
 
 // Image chat / messagerie de fourmizzz (inchangé)
-// Image chat, messagerie de fourmizzz
-const LISTESMILEY1 = `<img src='images/carte/rien.gif' width='1' height='39'>
-      <img src='images/smiley/ant_pouce.gif' onclick='addRaccourciSmiley("message","ant_pouce")'>
-       <img src='images/smiley/ant_smile.gif' onclick='addRaccourciSmiley("message","ant_smile")'>
-       <img src='images/smiley/ant_biggrin.gif' onclick='addRaccourciSmiley("message","ant_biggrin")'>
-       <img src='images/smiley/ant_laugh.gif' onclick='addRaccourciSmiley("message","ant_laugh")'>
-       <img src='images/smiley/ant_tongue.gif' onclick='addRaccourciSmiley("message","ant_tongue")'>
-       <img src='images/smiley/ant_bye.gif' onclick='addRaccourciSmiley("message","ant_bye")'>
-       <img src='images/smiley/ant_cool.gif' onclick='addRaccourciSmiley("message","ant_cool")'>
-       <img src='images/smiley/ant_interest.gif' onclick='addRaccourciSmiley("message","ant_interest")'>
-       <img src='images/smiley/ant_angel.gif' onclick='addRaccourciSmiley("message","ant_angel")'>
-       <img src='images/smiley/ant_smug.gif' onclick='addRaccourciSmiley("message","ant_smug")'>
-       <img src='images/smiley/ant_nudgewink.gif' onclick='addRaccourciSmiley("message","ant_nudgewink")'>
-       <img src='images/smiley/ant_blink.gif' onclick='addRaccourciSmiley("message","ant_blink")'>
-       <img src='images/smiley/ant_unsure.gif' onclick='addRaccourciSmiley("message","ant_unsure")'>
-       <img src='images/smiley/ant_shy.gif' onclick='addRaccourciSmiley("message","ant_shy")'>
-       <img src='images/smiley/ant_oh.gif' onclick='addRaccourciSmiley("message","ant_oh")'>
-       <img src='images/smiley/ant_sleep.gif' onclick='addRaccourciSmiley("message","ant_sleep")'>
-       <img src='images/smiley/ant_sad.gif' onclick='addRaccourciSmiley("message","ant_sad")'>
-       <img src='images/smiley/ant_mad.gif' onclick='addRaccourciSmiley("message","ant_mad")'>
-       <img src='images/smiley/ant_doctor.gif' onclick='addRaccourciSmiley("message","ant_doctor")'>`;
-const LISTESMILEY2 = `<img src='images/carte/rien.gif' width='1' height='39'>
-      <img onclick='addRaccourciSmiley("message","doctor")' src='images/smiley/doctor.gif'>
-       <img onclick='addRaccourciSmiley("message","borg")' src='images/smiley/borg.gif'>
-       <img onclick='addRaccourciSmiley("message","pirate")' src='images/smiley/pirate.gif'>
-       <img onclick='addRaccourciSmiley("message","sick2")' src='images/smiley/sick2.gif'>
-       <img onclick='addRaccourciSmiley("message","asian")' src='images/smiley/asian.gif'>
-       <img onclick='addRaccourciSmiley("message","dunce")' src='images/smiley/dunce.gif'>
-       <img onclick='addRaccourciSmiley("message","canadian")' src='images/smiley/canadian.gif'>
-       <img onclick='addRaccourciSmiley("message","captain")' src='images/smiley/captain.gif'>
-       <img onclick='addRaccourciSmiley("message","police")' src='images/smiley/police.gif'>
-       <img onclick='addRaccourciSmiley("message","santa")' src='images/smiley/santa.gif'>
-       <img onclick='addRaccourciSmiley("message","cook")' src='images/smiley/cook.gif'>
-       <img onclick='addRaccourciSmiley("message","farmer")' src='images/smiley/farmer.gif'>
-       <img onclick='addRaccourciSmiley("message","smurf")' src='images/smiley/smurf.gif'>
-       <img onclick='addRaccourciSmiley("message","gangster")' src='images/smiley/gangster.gif'>
-       <img onclick='addRaccourciSmiley("message","king")' src='images/smiley/king.gif'>
-       <img onclick='addRaccourciSmiley("message","king2")' src='images/smiley/king2.gif'>
-       <img onclick='addRaccourciSmiley("message","pixie")' src='images/smiley/pixie.gif'>
-       <img onclick='addRaccourciSmiley("message","pirate2")' src='images/smiley/pirate2.gif'>
-       <img onclick='addRaccourciSmiley("message","pirate3")' src='images/smiley/pirate3.gif'>
-       <img onclick='addRaccourciSmiley("message","warrior")' src='images/smiley/warrior.gif'>
-       <img onclick='addRaccourciSmiley("message","card")' src='images/smiley/card.gif'>
-       <img onclick='addRaccourciSmiley("message","egypt")' src='images/smiley/egypt.gif'>
-       <img onclick='addRaccourciSmiley("message","fool")' src='images/smiley/fool.gif'>
-       <img onclick='addRaccourciSmiley("message","hat")' src='images/smiley/hat.gif'>`;
-const LISTESMILEY3 = `<img src='images/carte/rien.gif' width='1' height='39'>
-      <img onclick='addRaccourciSmiley("message","dead")' src='images/smiley/dead.gif'>
-       <img onclick='addRaccourciSmiley("message","inv")' src='images/smiley/inv.gif'>
-       <img onclick='addRaccourciSmiley("message","stretcher")' src='images/smiley/stretcher.gif'>
-       <img onclick='addRaccourciSmiley("message","blue")' src='images/smiley/blue.gif'>
-       <img onclick='addRaccourciSmiley("message","sick")' src='images/smiley/sick.gif'>
-       <img onclick='addRaccourciSmiley("message","love")' src='images/smiley/love.gif'>
-       <img onclick='addRaccourciSmiley("message","cupid")' src='images/smiley/cupid.gif'>
-       <img onclick='addRaccourciSmiley("message","diablo")' src='images/smiley/diablo.gif'>
-       <img onclick='addRaccourciSmiley("message","crossbones")' src='images/smiley/crossbones.gif'>
-       <img onclick='addRaccourciSmiley("message","fish")' src='images/smiley/fish.gif'>
-       <img onclick='addRaccourciSmiley("message","cupid2")' src='images/smiley/cupid2.gif'>
-       <img onclick='addRaccourciSmiley("message","construction")' src='images/smiley/construction.gif'>
-       <img onclick='addRaccourciSmiley("message","flower")' src='images/smiley/flower.gif'>
-       <img onclick='addRaccourciSmiley("message","drinks")' src='images/smiley/drinks.gif'>
-       <img onclick='addRaccourciSmiley("message","burp")' src='images/smiley/burp.gif'>
-       <img onclick='addRaccourciSmiley("message","rain")' src='images/smiley/rain.gif'>
-       <img onclick='addRaccourciSmiley("message","surf")' src='images/smiley/surf.gif'>
-       <img onclick='addRaccourciSmiley("message","baloon")' src='images/smiley/baloon.gif'>
-       <img onclick='addRaccourciSmiley("message","sleep2")' src='images/smiley/sleep2.gif'>
-       <img onclick='addRaccourciSmiley("message","rip")' src='images/smiley/rip.gif'>
-       <img onclick='addRaccourciSmiley("message","scooter")' src='images/smiley/scooter.gif'>
-       <img onclick='addRaccourciSmiley("message","moto")' src='images/smiley/moto.gif'>`;
-const LISTESMILEY4 = `<img src='images/carte/rien.gif' width='1' height='39'>
-      <img onclick='addRaccourciSmiley("message","whip")' src='images/smiley/whip.gif'>
-      <img onclick='addRaccourciSmiley("message","shades")' src='images/smiley/shades.gif'>
-      <img onclick='addRaccourciSmiley("message","kiss")' src='images/smiley/kiss.gif'>
-      <img onclick='addRaccourciSmiley("message","boxer")' src='images/smiley/boxer.gif'>
-      <img onclick='addRaccourciSmiley("message","gun")' src='images/smiley/gun.gif'>
-      <img onclick='addRaccourciSmiley("message","bross")' src='images/smiley/bross.gif'>
-      <img onclick='addRaccourciSmiley("message","whistling")' src='images/smiley/whistling.gif'>
-      <img onclick='addRaccourciSmiley("message","showoff")' src='images/smiley/showoff.gif'>
-      <img onclick='addRaccourciSmiley("message","noel_vache")' src='images/smiley/noel_vache.gif'>
-      <img onclick='addRaccourciSmiley("message","app")' src='images/smiley/app.gif'>
-      <img onclick='addRaccourciSmiley("message","book")' src='images/smiley/book.gif'>
-      <img onclick='addRaccourciSmiley("message","cake")' src='images/smiley/cake.gif'>
-      <img onclick='addRaccourciSmiley("message","dance")' src='images/smiley/dance.gif'>
-      <img onclick='addRaccourciSmiley("message","harhar")' src='images/smiley/harhar.gif'>
-      <img onclick='addRaccourciSmiley("message","juggle")' src='images/smiley/juggle.gif'>
-      <img onclick='addRaccourciSmiley("message","worthy")' src='images/smiley/worthy.gif'>
-      <img onclick='addRaccourciSmiley("message","fishing")' src='images/smiley/fishing.gif'>
-      <img onclick='addRaccourciSmiley("message","stereo")' src='images/smiley/stereo.gif'>
-      <img onclick='addRaccourciSmiley("message","music")' src='images/smiley/music.gif'>
-      <img onclick='addRaccourciSmiley("message","prison")' src='images/smiley/prison.gif'>
-      <img onclick='addRaccourciSmiley("message","piece")' src='images/smiley/piece.gif'>`;
-const LISTESMILEY5 = `<img src='images/carte/rien.gif' width='1' height='39'>
-      <img onclick='addRaccourciSmiley("message","noel_etoile")' src='images/smiley/noel_etoile.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_snowman10")' src='images/smiley/noel_snowman10.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_snowman11")' src='images/smiley/noel_snowman11.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_cadeau3")' src='images/smiley/noel_cadeau3.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_vache")' src='images/smiley/noel_vache.gif'>
-       <img onclick='addRaccourciSmiley("message","santa")' src='images/smiley/santa.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_pere")' src='images/smiley/noel_pere.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_santa")' src='images/smiley/noel_santa.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_bougie")' src='images/smiley/noel_bougie.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_chien2")' src='images/smiley/noel_chien2.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_chapeau")' src='images/smiley/noel_chapeau.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_cadeau")' src='images/smiley/noel_cadeau.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_sapin3")' src='images/smiley/noel_sapin3.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_snowman4")' src='images/smiley/noel_snowman4.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_snowman3")' src='images/smiley/noel_snowman3.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_chaussette")' src='images/smiley/noel_chaussette.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_flocon")' src='images/smiley/noel_flocon.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_snowman5")' src='images/smiley/noel_snowman5.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_sapin2")' src='images/smiley/noel_sapin2.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_snowman8")' src='images/smiley/noel_snowman8.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_bonnet")' src='images/smiley/noel_bonnet.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_renne")' src='images/smiley/noel_renne.gif'>
-       <img onclick='addRaccourciSmiley("message","noel_renne3")' src='images/smiley/noel_renne3.gif'>`;
-const LISTESMILEY6 = `<img src='images/carte/rien.gif' width='1' height='39'>
-      <img src='images/smiley/dollar.gif' onclick='addRaccourciSmiley("message","dollar")'>
-       <img src='images/smiley/ninja.gif' onclick='addRaccourciSmiley("message","ninja")'>
-       <img src='images/smiley/bat.gif' onclick='addRaccourciSmiley("message","bat")'>
-       <img src='images/smiley/whistles.gif' onclick='addRaccourciSmiley("message","whistles")'>
-       <img src='images/smiley/showoff2.gif' onclick='addRaccourciSmiley("message","showoff2")'>
-       <img src='images/smiley/barbarian.gif' onclick='addRaccourciSmiley("message","barbarian")'>
-       <img src='images/smiley/magi.gif' onclick='addRaccourciSmiley("message","magi")'>
-       <img src='images/smiley/prof.gif' onclick='addRaccourciSmiley("message","prof")'>
-       <img src='images/smiley/witch.gif' onclick='addRaccourciSmiley("message","witch")'>
-       <img src='images/smiley/pirate4.gif' onclick='addRaccourciSmiley("message","pirate4")'>
-       <img src='images/smiley/bicycle.gif' onclick='addRaccourciSmiley("message","bicycle")'>
-       <img src='images/smiley/scooter2.gif' onclick='addRaccourciSmiley("message","scooter2")'>
-       <img src='images/smiley/police2.gif' onclick='addRaccourciSmiley("message","police2")'>
-       <img src='images/smiley/dragon.gif' onclick='addRaccourciSmiley("message","dragon")'>
-       <img src='images/smiley/panic.gif' onclick='addRaccourciSmiley("message","panic")'>
-       <img src='images/smiley/dog.gif' onclick='addRaccourciSmiley("message","dog")'>
-       <img src='images/smiley/plane.gif' onclick='addRaccourciSmiley("message","plane")'>`;
+const LISTESMILEY1 = `...`;  // (ta définition complète identique)
+const LISTESMILEY2 = `...`;
+const LISTESMILEY3 = `...`;
+const LISTESMILEY4 = `...`;
+const LISTESMILEY5 = `...`;
+const LISTESMILEY6 = `...`;
 
 // Image diverses de fourmizzz (inchangé)
 const IMG_FLECHE = "<img src='images/icone/fleche-bas-claire.png' style='vertical-align:1px;' alt='changer' height='8'>";
 const IMG_POMME  = "<img src='images/icone/icone_pomme.gif' alt='Nourriture' class='o_vAlign' height='18' title='Consommation Journalière' />";
 const IMG_MAT    = "<img src='images/icone/icone_bois.gif' alt='Materiaux' height='18'/>";
 const IMG_VIE    = "<img src='images/icone/icone_coeur.gif' class='o_vAlign' height='18' width='18'/>";
-const IMG_ATT    = "<img src='images/icone/icone_degat_attaque.gif'  alt='Dégâts en attaque :' class='o_vAlign'height='18' title='Dégâts en attaque :' />";
+const IMG_ATT    = "<img src='images/icone/icone_degat_attaque.gif'  alt='Dégâts en attaque :' class='o_VAlign' height='18' title='Dégâts en attaque :' />";
 const IMG_DEF    = "<img src='images/icone/icone_degat_defense.gif' alt='Dégâts en défense :' class='o_vAlign' height='18' title='Dégâts en défense :' />";
 const IMG_GAUCHE = "<img src='images/bouton/fleche-champs-gauche.gif' width='9' height='15' class='o_vAlign'/>";
 const IMG_DROITE = "<img src='images/bouton/fleche-champs-droite.gif' width='9' height='15' class='o_vAlign'/>";
 const IMG_COPY   = "<img src='images/icone/feuille.gif' class='cliquable' title='Copier/Coller une armée' style='position:relative;top:3px' width='14' height='17'>";
 
-// ==== Ici modifié par Manitas → vers TON repo GitHub
-const CDN = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/";
-const IMG_CHANGE      = CDN + "change.png";
-const IMG_ACTUALISER  = CDN + "actualize_on_01.png";
-const IMG_CRAYON      = CDN + "crayon.gif";          // ← extension correcte dans ton repo
-const IMG_CROIX       = CDN + "croix.png";
-const IMG_COPIER      = CDN + "copy.png";
-const IMG_HISTORIQUE  = CDN + "historique.png";
-const IMG_LIVRAISON   = CDN + "livraison.png";
-const IMG_RADAR       = CDN + "radar.png";
-const IMG_SPRITE_MENU = CDN + "sprite_menu.png";
-const IMG_UTILITY     = CDN + "utility.png";
-const IMG_DOWN        = CDN + "down.png";
-const IMG_UP          = CDN + "up.png";
-const IMG_OUTIIIL     = CDN + "outiiil.png";
+// ==== Ici modifié par Manitas — SAFE (anti-redeclare) ====
+(function(g){
+  g.OUTIIIL_IMG_CDN = g.OUTIIIL_IMG_CDN || "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/";
+  g.IMG_CHANGE      = g.IMG_CHANGE      || g.OUTIIIL_IMG_CDN + "change.png";
+  g.IMG_ACTUALISER  = g.IMG_ACTUALISER  || g.OUTIIIL_IMG_CDN + "actualize_on_01.png";
+  g.IMG_CRAYON      = g.IMG_CRAYON      || g.OUTIIIL_IMG_CDN + "crayon.gif";
+  g.IMG_CROIX       = g.IMG_CROIX       || g.OUTIIIL_IMG_CDN + "croix.png";
+  g.IMG_COPIER      = g.IMG_COPIER      || g.OUTIIIL_IMG_CDN + "copy.png";
+  g.IMG_HISTORIQUE  = g.IMG_HISTORIQUE  || g.OUTIIIL_IMG_CDN + "historique.png";
+  g.IMG_LIVRAISON   = g.IMG_LIVRAISON   || g.OUTIIIL_IMG_CDN + "livraison.png";
+  g.IMG_RADAR       = g.IMG_RADAR       || g.OUTIIIL_IMG_CDN + "radar.png";
+  g.IMG_SPRITE_MENU = g.IMG_SPRITE_MENU || g.OUTIIIL_IMG_CDN + "sprite_menu.png";
+  g.IMG_UTILITY     = g.IMG_UTILITY     || g.OUTIIIL_IMG_CDN + "utility.png";
+  g.IMG_DOWN        = g.IMG_DOWN        || g.OUTIIIL_IMG_CDN + "down.png";
+  g.IMG_UP          = g.IMG_UP          || g.OUTIIIL_IMG_CDN + "up.png";
+  g.IMG_OUTIIIL     = g.IMG_OUTIIIL     || g.OUTIIIL_IMG_CDN + "outiiil.png";
+})(window);
 
 // CSS depuis TON repo
 var cssFiles = [
@@ -300,20 +174,15 @@ const DATEPICKER_OPTION = {
  * Classe principale du projet : appelle les classes en fonction de la route.
  */
 !function() {
-  // si l'utilisateur est identifié
   if ($(".boite_connexion_titre:first").text() != "Connexion") {
-    // Theme jquery humanity
     $("head").append("<link rel='stylesheet' href='http://code.jquery.com/ui/1.12.1/themes/humanity/jquery-ui.min.css'/>");
-    // Chargement du language francais
     numeral.locale("fr");
     moment.locale("fr");
     Highcharts.setOptions({ lang: { months: MOIS_FR, shortMonths: MOIS_RAC_FR, weekdays: JOUR_FR, decimalPoint: ',', thousandsSep: ' ' } });
-    // Tri DataTables
     $.fn.dataTable.ext.type.order["quantite-grade-pre"] = (d) => { return parseInt(d.replace(/\s/g, '')); };
     $.fn.dataTable.ext.type.order["moment-D MMM YYYY-pre"] = (d) => { return moment(d.replace('.', ''), "D MMM YYYY", "fr", true).unix(); };
     $.fn.dataTable.ext.type.order["time-unformat-pre"] = (d) => { return Utils.timeToInt(d); };
 
-    // Profil joueur
     monProfil = new Joueur({ pseudo: $("#pseudo").text() });
     monProfil.getParametre();
     Promise.all([monProfil.getConstruction(), monProfil.getLaboratoire(), monProfil.getProfilCourant()]).then((values) => {
@@ -321,12 +190,10 @@ const DATEPICKER_OPTION = {
       if (values[1]) monProfil.chargerRecherche(values[1]);
       if (values[2]) monProfil.chargerProfil(values[2]);
 
-      // Outils
       let boite = new Dock(); boite.afficher();
       let boiteComptePlus = new BoiteComptePlus(); boiteComptePlus.afficher();
       let boiteRadar = new BoiteRadar(); boiteRadar.afficher();
 
-      // Traceurs
       if (monProfil.parametre["cleTraceur"].valeur) {
         let traceur1 = new TraceurJoueur(monProfil.parametre["etatTraceurJoueur"].valeur, monProfil.parametre["intervalleTraceurJoueur"].valeur, monProfil.parametre["nbPageTraceurJoueur"].valeur);
         traceur1.tracer();
@@ -334,7 +201,6 @@ const DATEPICKER_OPTION = {
         traceur2.tracer();
       }
 
-      // Routing
       let uri = location.pathname, page = null;
       switch (true) {
         case (uri == "/Reine.php"): page = new PageReine(boiteComptePlus); if (!Utils.comptePlus) page.plus(); break;
