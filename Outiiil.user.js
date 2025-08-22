@@ -233,7 +233,6 @@ const DATEPICKER_OPTION = {
         case (uri == "/Armee.php"): page = new PageArmee(boiteComptePlus); page.executer(); break;
         case (uri == "/commerce.php"): page = new PageCommerce(boiteComptePlus); page.executer(); break;
         case (uri == "/messagerie.php"): page = new PageMessagerie(); page.executer(); break;
-        case (uri == "/messagerie.php"): page = new PageMessagerie(); page.executer(); try { if (window.BoiteMessageriePlus) new BoiteMessageriePlus().afficher(); } catch(e){ console.warn('[Outiiil] MessageriePlus init:', e); break;                                                                                                                                                                 
         case (uri == "/alliance.php" && location.search == ""):
         case (uri == "/chat.php"): page = new PageChat(); page.executer(); break;
         case (location.href.indexOf("/alliance.php?forum_menu") > 0): page = new PageForum(); page.executer(); break;
