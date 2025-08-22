@@ -1,82 +1,81 @@
 // ==UserScript==
-// @name        Outiil v2
-// @version     2.2.3
-// @author      Hraesvelg, modifié par White
-// @downloadURL  https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js
-// @updateURL    https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js
-
-
-// @description Outiil de Hraesvelg herbergé par Manitas voire ici pour les sources originales : https://github.com/Hraesvelg/Outiiil, existe aussi en extension Chrome
-
+// @name        Outiil (GitHub build)
+// @author      Hraesvelg, modifié par Manitas
+// @version     2.1.1
+// @description Outiil de Hraesvelg hébergé sur ton GitHub : https://github.com/LeTristoune81/Outiiil
 // @match       http://*.fourmizzz.fr/*
+// @namespace   http://silas5988.free.fr/
+// @run-at      document-end
+// @noframes
 
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Boite.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Chasse.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Combat.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Commande.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/ComptePlus.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Dock.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Map.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Parametres.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Ponte.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Radar.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Rang.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Rapport.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Traceur.js
+ // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.2.1/jquery.min.js
+ // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Alliance.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Armee.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Chasse.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Combat.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Commande.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Convoi.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Joueur.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Parametre.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Traceur.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/TraceurAlliance.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/TraceurJoueur.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Utils.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/clipboard_1.7.1.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/datatables_1.10.16.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/globalize_0.1.1.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/globalize-locale-fr.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/highcharts_6.0.7.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/highcharts-data.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/highcharts-more.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/highcharts-stock.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/moment_2.19.1.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/moment-duration-format.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/moment-locale-fr.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/numeral_2.0.6.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/numeral-locale-fr.js
 
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/clipboard_1.7.1.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/datatables_1.10.16.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/globalize_0.1.1.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/globalize-locale-fr.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/highcharts_6.0.7.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/highcharts-data.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/highcharts-more.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/highcharts-stock.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Alliance.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Armee.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Chasse.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Combat.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Commande.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Convoi.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Joueur.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Parametre.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Traceur.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/TraceurAlliance.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/TraceurJoueur.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Utils.js
 
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Boite.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Chasse.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Combat.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Commande.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/ComptePlus.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Dock.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Map.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Parametres.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Ponte.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Radar.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Rang.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Rapport.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Traceur.js
 
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/moment_2.19.1.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/moment-duration-format.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/moment-locale-fr.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/numeral_2.0.6.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/numeral-locale-fr.js
-
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Alliance.js
-// @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/page/Armee.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Attaquer.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Chat.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Commerce.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Construction.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Description.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Forum.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Laboratoire.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Messagerie.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Profil.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Reine.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Ressource.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Alliance.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Armee.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Attaquer.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Chat.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Commerce.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Construction.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Description.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Forum.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Laboratoire.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Messagerie.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Profil.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Reine.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Ressource.js
 // ==/UserScript==
 
 /*
- * main.js
- * Hraesvelg
- *********************************************************************
-/*
+ * main.js — version Manitas, adapté GitHub
+ * (logic identique, on ne touche pas aux const métiers)
+ */
+
 /**
  * CONSTANTE
  */
-const VERSION = "2.2.0";
+const VERSION = "2.1.0";
 const CONSTRUCTION = ["Champignonnière", "Entrepôt de Nourriture", "Entrepôt de Matériaux", "Couveuse", "Solarium", "Laboratoire", "Salle d'analyse", "Salle de combat", "Caserne", "Dôme", "Loge Impériale", "Etable à pucerons", "Etable à cochenilles"];
 const RECHERCHE = ["Technique de ponte", "Bouclier Thoracique", "Armes", "Architecture", "Communication avec les animaux", "Vitesse de chasse", "Vitesse d'attaque", "Génétique", "Acide", "Poison"];
 const COUT_CONSTUCTION = [90, 600, 600, 600, 2000, 1400, 1400, 300, 800, 3500, 5000, 1500, 10000];
@@ -97,6 +96,8 @@ const PERTE_MAX_CHASSE = [0.33333334, 0.176739357, 0.113191158, 0.08245817, 0.05
 const ORDRE_UNITE_CHASSE = [10, 3, 4, 1, 12, 7, 5, 13, 11, 9, 8, 6, 2];
 const ORDRE_XP_CHASSE = [10, 3, 4, 1, 12, 7, 5];
 const REPLIQUE_CHASSE = [0, 0, 0, 0.016, 0.093, 0.345, 0.577777778, 0.753, 0.837, 0.874, 0.937, 0.96, 0.989];
+
+// Image chat / messagerie de fourmizzz (inchangé)
 // Image chat, messagerie de fourmizzz
 const LISTESMILEY1 = `<img src='images/carte/rien.gif' width='1' height='39'>
       <img src='images/smiley/ant_pouce.gif' onclick='addRaccourciSmiley("message","ant_pouce")'>
@@ -230,68 +231,55 @@ const LISTESMILEY6 = `<img src='images/carte/rien.gif' width='1' height='39'>
        <img src='images/smiley/panic.gif' onclick='addRaccourciSmiley("message","panic")'>
        <img src='images/smiley/dog.gif' onclick='addRaccourciSmiley("message","dog")'>
        <img src='images/smiley/plane.gif' onclick='addRaccourciSmiley("message","plane")'>`;
-// Image diverses de fourmizzz
+
+// Image diverses de fourmizzz (inchangé)
 const IMG_FLECHE = "<img src='images/icone/fleche-bas-claire.png' style='vertical-align:1px;' alt='changer' height='8'>";
-const IMG_POMME = "<img src='images/icone/icone_pomme.gif' alt='Nourriture' class='o_vAlign' height='18' title='Consommation Journalière' />";
-const IMG_MAT = "<img src='images/icone/icone_bois.gif' alt='Materiaux' height='18'/>";
-const IMG_VIE = "<img src='images/icone/icone_coeur.gif' class='o_vAlign' height='18' width='18'/>";
-const IMG_ATT = "<img src='images/icone/icone_degat_attaque.gif'  alt='Dégâts en attaque :' class='o_vAlign'height='18' title='Dégâts en attaque :' />";
-const IMG_DEF = "<img src='images/icone/icone_degat_defense.gif' alt='Dégâts en défense :' class='o_vAlign' height='18' title='Dégâts en défense :' />";
+const IMG_POMME  = "<img src='images/icone/icone_pomme.gif' alt='Nourriture' class='o_vAlign' height='18' title='Consommation Journalière' />";
+const IMG_MAT    = "<img src='images/icone/icone_bois.gif' alt='Materiaux' height='18'/>";
+const IMG_VIE    = "<img src='images/icone/icone_coeur.gif' class='o_vAlign' height='18' width='18'/>";
+const IMG_ATT    = "<img src='images/icone/icone_degat_attaque.gif'  alt='Dégâts en attaque :' class='o_vAlign'height='18' title='Dégâts en attaque :' />";
+const IMG_DEF    = "<img src='images/icone/icone_degat_defense.gif' alt='Dégâts en défense :' class='o_vAlign' height='18' title='Dégâts en défense :' />";
 const IMG_GAUCHE = "<img src='images/bouton/fleche-champs-gauche.gif' width='9' height='15' class='o_vAlign'/>";
 const IMG_DROITE = "<img src='images/bouton/fleche-champs-droite.gif' width='9' height='15' class='o_vAlign'/>";
-const IMG_COPY = "<img src='images/icone/feuille.gif' class='cliquable' title='Copier/Coller une armée' style='position:relative;top:3px' width='14' height='17'>";
+const IMG_COPY   = "<img src='images/icone/feuille.gif' class='cliquable' title='Copier/Coller une armée' style='position:relative;top:3px' width='14' height='17'>";
 
-// Image pour l'extension
-// const IMG_CHANGE      = OUTIIL_ROOT + 'images/change.png';
-// const IMG_ACTUALISER  = OUTIIL_ROOT + 'images/actualize_on_01.png';
-// const IMG_CRAYON      = OUTIIL_ROOT + 'images/crayon.gif';
-// const IMG_CROIX       = OUTIIL_ROOT + 'images/croix.png';
-// const IMG_COPIER      = OUTIIL_ROOT + 'images/copy.png';
-// const IMG_HISTORIQUE  = OUTIIL_ROOT + 'images/historique.png';
-// const IMG_LIVRAISON   = OUTIIL_ROOT + 'images/livraison.png';
-// const IMG_RADAR       = OUTIIL_ROOT + 'images/radar.png';
-// const IMG_SPRITE_MENU = OUTIIL_ROOT + 'images/sprite_menu.png';
-// const IMG_UTILITY     = OUTIIL_ROOT + 'images/utility.png';
-// const IMG_DOWN        = OUTIIL_ROOT + 'images/down.png';
-// const IMG_UP          = OUTIIL_ROOT + 'images/up.png';
-// const IMG_OUTIIIL     = OUTIIL_ROOT + 'images/outiiil.png';
+// ==== Ici modifié par Manitas → vers TON repo GitHub
+const CDN = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/";
+const IMG_CHANGE      = CDN + "change.png";
+const IMG_ACTUALISER  = CDN + "actualize_on_01.png";
+const IMG_CRAYON      = CDN + "crayon.gif";          // ← extension correcte dans ton repo
+const IMG_CROIX       = CDN + "croix.png";
+const IMG_COPIER      = CDN + "copy.png";
+const IMG_HISTORIQUE  = CDN + "historique.png";
+const IMG_LIVRAISON   = CDN + "livraison.png";
+const IMG_RADAR       = CDN + "radar.png";
+const IMG_SPRITE_MENU = CDN + "sprite_menu.png";
+const IMG_UTILITY     = CDN + "utility.png";
+const IMG_DOWN        = CDN + "down.png";
+const IMG_UP          = CDN + "up.png";
+const IMG_OUTIIIL     = CDN + "outiiil.png";
 
-
-// ==== Ici modifié par Manitas
-const IMG_CHANGE = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/change.png";
-const IMG_ACTUALISER = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/actualize_on_01.png";
-const IMG_CRAYON = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/crayon.png";
-const IMG_CROIX = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/croix.png";
-const IMG_COPIER = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/copy.png";
-const IMG_HISTORIQUE = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/historique.png";
-const IMG_LIVRAISON = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/livraison.png";
-const IMG_RADAR = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/radar.png";
-const IMG_SPRITE_MENU = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/sprite_menu.png";
-const IMG_UTILITY = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/utility.png";
-const IMG_DOWN = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/down.png";
-const IMG_UP = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/up.png";
-const IMG_OUTIIIL = "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/outiiil.png";
-
-var cssFiles = ["https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/css/outiiil.css", "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/css/toasts.css", "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/css/datatables.css"]
+// CSS depuis TON repo
+var cssFiles = [
+  "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/css/outiiil.css",
+  "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/css/toasts.css",
+  "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/css/datatables.css"
+];
 
 function loadcssfile(filename) {
-    var el = document.createElement("link"),
-        Head0 = document.getElementsByTagName('head')[0];
-    el.setAttribute("rel", "stylesheet");
-    el.setAttribute("type", "text/css");
-    el.setAttribute("href", filename);
-    Head0.appendChild(el);
+  var el = document.createElement("link"),
+      Head0 = document.getElementsByTagName('head')[0];
+  el.setAttribute("rel", "stylesheet");
+  el.setAttribute("type", "text/css");
+  el.setAttribute("href", filename);
+  Head0.appendChild(el);
 }
+cssFiles.forEach(loadcssfile);
 
-loadcssfile(cssFiles[0])
-loadcssfile(cssFiles[1])
-loadcssfile(cssFiles[2])
-    // ==== Ici modifié par Manitas
-
-const TOAST_ERROR = { heading: "Erreur", hideAfter: 3500, showHideTransition: "slide", position: { top: 30, right: 100 }, icon: "error" };
+const TOAST_ERROR   = { heading: "Erreur", hideAfter: 3500, showHideTransition: "slide", position: { top: 30, right: 100 }, icon: "error" };
 const TOAST_SUCCESS = { heading: "Succès", hideAfter: 3500, showHideTransition: "slide", position: { top: 30, right: 100 }, icon: "success" };
 const TOAST_WARNING = { heading: "Attention", hideAfter: 3500, showHideTransition: "slide", position: { top: 30, right: 100 }, icon: "warning" };
-const TOAST_INFO = { heading: "Information", hideAfter: 3500, showHideTransition: "slide", position: { top: 30, right: 100 }, icon: "info" };
+const TOAST_INFO    = { heading: "Information", hideAfter: 3500, showHideTransition: "slide", position: { top: 30, right: 100 }, icon: "info" };
 const EVOLUTION = [...CONSTRUCTION, ...RECHERCHE, "Nourriture", "Materiaux"];
 const EFFET = ["", "Blind", "Bounce", "Clip", "Drop", "Explode", "Fade", "Fold", "Highlight", "Puff", "Pulsate", "Scale", "Shake", "Size", "Slide"];
 const METHODE_FLOOD = ["Standard", "Optimisée", "Uniforme", "Dégressive"];
@@ -302,144 +290,80 @@ const MOIS_FR = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet
 const MOIS_RAC_FR = ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'];
 const JOUR_FR = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 const DATEPICKER_OPTION = {
-    closeText: 'Fermer',
-    prevText: 'Précédent',
-    nextText: 'Suivant',
-    currentText: 'Aujourd\'hui',
-    monthNames: MOIS_FR,
-    monthNamesShort: MOIS_RAC_FR,
-    dayNames: JOUR_FR,
-    dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
-    dayNamesMin: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
-    weekHeader: 'Sem.',
-    dateFormat: 'dd-mm-yy',
-    firstDay: '1',
-    changeYear: true,
-    changeMonth: true
+  closeText: 'Fermer', prevText: 'Précédent', nextText: 'Suivant', currentText: 'Aujourd\'hui',
+  monthNames: MOIS_FR, monthNamesShort: MOIS_RAC_FR, dayNames: JOUR_FR,
+  dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'], dayNamesMin: ['D','L','M','M','J','V','S'],
+  weekHeader: 'Sem.', dateFormat: 'dd-mm-yy', firstDay: '1', changeYear: true, changeMonth: true
 };
 
 /**
  * Classe principale du projet : appelle les classes en fonction de la route.
- *
- * @class Main
  */
-! function() {
-    // si l'utilisateur est identifié
-    if ($(".boite_connexion_titre:first").text() != "Connexion") {
-        // Modification du theme jquery humanity
-        $("head").append("<link rel='stylesheet' href='http://code.jquery.com/ui/1.12.1/themes/humanity/jquery-ui.min.css'/>");
-        // Chargement du language francais
-        numeral.locale("fr");
-        moment.locale("fr");
-        Highcharts.setOptions({ lang: { months: MOIS_FR, shortMonths: MOIS_RAC_FR, weekdays: JOUR_FR, decimalPoint: ',', thousandsSep: ' ' } });
-        // Ajout du tri pour les nombres
-        $.fn.dataTable.ext.type.order["quantite-grade-pre"] = (d) => { return parseInt(d.replace(/\s/g, '')); };
-        $.fn.dataTable.ext.type.order["moment-D MMM YYYY-pre"] = (d) => { return moment(d.replace('.', ''), "D MMM YYYY", "fr", true).unix(); };
-        $.fn.dataTable.ext.type.order["time-unformat-pre"] = (d) => { return Utils.timeToInt(d); };
+!function() {
+  // si l'utilisateur est identifié
+  if ($(".boite_connexion_titre:first").text() != "Connexion") {
+    // Theme jquery humanity
+    $("head").append("<link rel='stylesheet' href='http://code.jquery.com/ui/1.12.1/themes/humanity/jquery-ui.min.css'/>");
+    // Chargement du language francais
+    numeral.locale("fr");
+    moment.locale("fr");
+    Highcharts.setOptions({ lang: { months: MOIS_FR, shortMonths: MOIS_RAC_FR, weekdays: JOUR_FR, decimalPoint: ',', thousandsSep: ' ' } });
+    // Tri DataTables
+    $.fn.dataTable.ext.type.order["quantite-grade-pre"] = (d) => { return parseInt(d.replace(/\s/g, '')); };
+    $.fn.dataTable.ext.type.order["moment-D MMM YYYY-pre"] = (d) => { return moment(d.replace('.', ''), "D MMM YYYY", "fr", true).unix(); };
+    $.fn.dataTable.ext.type.order["time-unformat-pre"] = (d) => { return Utils.timeToInt(d); };
 
-        // Initialisation du profil du joueur en cours
-        monProfil = new Joueur({ pseudo: $("#pseudo").text() });
-        // chargement des parametre
-        monProfil.getParametre();
-        // des qu'on les inos constructions/recherches et profil on affiches les outils
-        Promise.all([monProfil.getConstruction(), monProfil.getLaboratoire(), monProfil.getProfilCourant()]).then((values) => {
-            // chargement des données du joueur
-            if (values[0]) monProfil.chargerConstruction(values[0]);
-            if (values[1]) monProfil.chargerRecherche(values[1]);
-            if (values[2]) monProfil.chargerProfil(values[2]);
+    // Profil joueur
+    monProfil = new Joueur({ pseudo: $("#pseudo").text() });
+    monProfil.getParametre();
+    Promise.all([monProfil.getConstruction(), monProfil.getLaboratoire(), monProfil.getProfilCourant()]).then((values) => {
+      if (values[0]) monProfil.chargerConstruction(values[0]);
+      if (values[1]) monProfil.chargerRecherche(values[1]);
+      if (values[2]) monProfil.chargerProfil(values[2]);
 
-            // Ajout des outils
-            let boite = new Dock();
-            boite.afficher();
-            // boite compte plus
-            let boiteComptePlus = new BoiteComptePlus();
-            boiteComptePlus.afficher();
-            // Boite radar
-            let boiteRadar = new BoiteRadar();
-            boiteRadar.afficher();
+      // Outils
+      let boite = new Dock(); boite.afficher();
+      let boiteComptePlus = new BoiteComptePlus(); boiteComptePlus.afficher();
+      let boiteRadar = new BoiteRadar(); boiteRadar.afficher();
 
-            // Traceur
-            if (monProfil.parametre["cleTraceur"].valeur) {
-                let traceur1 = new TraceurJoueur(monProfil.parametre["etatTraceurJoueur"].valeur, monProfil.parametre["intervalleTraceurJoueur"].valeur, monProfil.parametre["nbPageTraceurJoueur"].valeur);
-                traceur1.tracer();
-                let traceur2 = new TraceurAlliance(monProfil.parametre["etatTraceurAlliance"].valeur, monProfil.parametre["intervalleTraceurAlliance"].valeur);
-                traceur2.tracer();
-            }
+      // Traceurs
+      if (monProfil.parametre["cleTraceur"].valeur) {
+        let traceur1 = new TraceurJoueur(monProfil.parametre["etatTraceurJoueur"].valeur, monProfil.parametre["intervalleTraceurJoueur"].valeur, monProfil.parametre["nbPageTraceurJoueur"].valeur);
+        traceur1.tracer();
+        let traceur2 = new TraceurAlliance(monProfil.parametre["etatTraceurAlliance"].valeur, monProfil.parametre["intervalleTraceurAlliance"].valeur);
+        traceur2.tracer();
+      }
 
-            let uri = location.pathname,
-                page = null;
-            // Routing
-            switch (true) {
-                case (uri == "/Reine.php"):
-                    page = new PageReine(boiteComptePlus);
-                    if (!Utils.comptePlus) page.plus();
-                    break;
-                case (uri == "/construction.php"):
-                    page = new PageConstruction(boiteComptePlus);
-                    page.executer();
-                    break;
-                case (uri == "/laboratoire.php"):
-                    page = new PageLaboratoire(boiteComptePlus);
-                    page.executer();
-                    break;
-                case (uri == "/Ressources.php"):
-                    page = new PageRessource(boiteComptePlus);
-                    page.executer();
-                    break;
-                case (uri == "/Armee.php"):
-                    page = new PageArmee(boiteComptePlus);
-                    page.executer();
-                    break;
-                case (uri == "/commerce.php"):
-                    page = new PageCommerce(boiteComptePlus);
-                    page.executer();
-                    break;
-                case (uri == "/messagerie.php"):
-                    page = new PageMessagerie();
-                    page.executer();
-                    break;
-                case (uri == "/alliance.php" && location.search == ""):
-                case (uri == "/chat.php"):
-                    page = new PageChat();
-                    page.executer();
-                    break;
-                case (location.href.indexOf("/alliance.php?forum_menu") > 0):
-                    page = new PageForum();
-                    page.executer();
-                    break;
-                case (location.href.indexOf("/alliance.php?Membres") > 0):
-                    page = new PageAlliance();
-                    page.executer();
-                    break;
-                case (location.href.indexOf("/Membre.php?Pseudo") > 0):
-                case (uri == "/Membre.php"):
-                    page = new PageProfil(boiteRadar);
-                    page.executer();
-                    break;
-                case (uri == "/classementAlliance.php" && Utils.extractUrlParams()["alliance"] != "" && Utils.extractUrlParams()["alliance"] != undefined):
-                    page = new PageDescription(boiteRadar);
-                    page.executer();
-                    break;
-                case (location.href.indexOf("/ennemie.php?Attaquer") > 0):
-                case (location.href.indexOf("/ennemie.php?annuler") > 0):
-                    page = new PageAttaquer(boiteComptePlus);
-                    page.executer();
-                    break;
-                case (uri == "/ennemie.php" && location.search == ""):
-                    // Affichage des temps de trajet
-                    $("#tabEnnemie tr:eq(0) th:eq(5)").after("<th class='centre'>Temps</th>");
-                    $("#tabEnnemie tr:gt(0)").each((i, elt) => {
-                        let distance = parseInt($(elt).find("td:eq(5)").text());
-                        $(elt).find("td:eq(5)").after(`<td class='centre'>${Utils.intToTime(Math.ceil(Math.pow(0.9, monProfil.niveauRecherche[6]) * 637200 * (1 - Math.exp(-(distance / 350)))))}</td>`);
-                    });
-                    break;
-                default:
-                    break;
-            }
-        });
-          // === Ajout : suppression du bouton “Replacer l’armée” ===
-$(function(){
-    $('#o_replaceArmee').remove();
-});
-    }
+      // Routing
+      let uri = location.pathname, page = null;
+      switch (true) {
+        case (uri == "/Reine.php"): page = new PageReine(boiteComptePlus); if (!Utils.comptePlus) page.plus(); break;
+        case (uri == "/construction.php"): page = new PageConstruction(boiteComptePlus); page.executer(); break;
+        case (uri == "/laboratoire.php"): page = new PageLaboratoire(boiteComptePlus); page.executer(); break;
+        case (uri == "/Ressources.php"): page = new PageRessource(boiteComptePlus); page.executer(); break;
+        case (uri == "/Armee.php"): page = new PageArmee(boiteComptePlus); page.executer(); break;
+        case (uri == "/commerce.php"): page = new PageCommerce(boiteComptePlus); page.executer(); break;
+        case (uri == "/messagerie.php"): page = new PageMessagerie(); page.executer(); break;
+        case (uri == "/alliance.php" && location.search == ""):
+        case (uri == "/chat.php"): page = new PageChat(); page.executer(); break;
+        case (location.href.indexOf("/alliance.php?forum_menu") > 0): page = new PageForum(); page.executer(); break;
+        case (location.href.indexOf("/alliance.php?Membres") > 0): page = new PageAlliance(); page.executer(); break;
+        case (location.href.indexOf("/Membre.php?Pseudo") > 0):
+        case (uri == "/Membre.php"): page = new PageProfil(boiteRadar); page.executer(); break;
+        case (uri == "/classementAlliance.php" && Utils.extractUrlParams()["alliance"] != "" && Utils.extractUrlParams()["alliance"] != undefined):
+          page = new PageDescription(boiteRadar); page.executer(); break;
+        case (location.href.indexOf("/ennemie.php?Attaquer") > 0):
+        case (location.href.indexOf("/ennemie.php?annuler") > 0):
+          page = new PageAttaquer(boiteComptePlus); page.executer(); break;
+        case (uri == "/ennemie.php" && location.search == ""):
+          $("#tabEnnemie tr:eq(0) th:eq(5)").after("<th class='centre'>Temps</th>");
+          $("#tabEnnemie tr:gt(0)").each((i, elt) => {
+            let distance = parseInt($(elt).find("td:eq(5)").text());
+            $(elt).find("td:eq(5)").after(`<td class='centre'>${Utils.intToTime(Math.ceil(Math.pow(0.9, monProfil.niveauRecherche[6]) * 637200 * (1 - Math.exp(-(distance / 350)))))}</td>`);
+          });
+          break;
+        default: break;
+      }
+    });
+  }
 }();
