@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Outiiil
 // @author      WhiteRabbit
-// @version     2.1.10
+// @version     2.1.11
 // @description Outiil de Hraesvelg Modifié par WhiteRabbit
 // @match       http://*.fourmizzz.fr/*
 // @run-at      document-end
@@ -46,7 +46,7 @@
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/TraceurJoueur.js
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Utils.js
 
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/MessageriePlus.js
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/MessagerieExport.js?v=2.1.7
 
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Boite.js
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Chasse.js
@@ -225,43 +225,112 @@ const DATEPICKER_OPTION = {
         traceur2.tracer();
       }
 
-      let uri = location.pathname, page = null;
-      switch (true) {
-        case (uri == "/Reine.php"): page = new PageReine(boiteComptePlus); if (!Utils.comptePlus) page.plus(); break;
-        case (uri == "/construction.php"): page = new PageConstruction(boiteComptePlus); page.executer(); break;
-        case (uri == "/laboratoire.php"): page = new PageLaboratoire(boiteComptePlus); page.executer(); break;
-        case (uri == "/Ressources.php"): page = new PageRessource(boiteComptePlus); page.executer(); break;
-        case (uri == "/Armee.php"): page = new PageArmee(boiteComptePlus); page.executer(); break;
-        case (uri == "/commerce.php"): page = new PageCommerce(boiteComptePlus); page.executer(); break;
-        case (uri == "/messagerie.php"): page = new PageMessagerie(); page.executer(); break;
-        case (uri == "/messagerie.php"):
-  page = new PageMessagerie();
-  page.executer();
-  try {
-    if (window.BoiteMessageriePlus) new BoiteMessageriePlus().afficher();
-  } catch(e){ console.warn('[Outiiil] MessageriePlus init:', e); }
-  break;
+     let uri = location.pathname, page = null;
+switch (true) {
+  case (uri == "/Reine.php"):
+    page = new PageReine(boiteComptePlus);
+    if (!Utils.comptePlus) page.plus();
+    break;
 
-        case (uri == "/alliance.php" && location.search == ""):
-        case (uri == "/chat.php"): page = new PageChat(); page.executer(); break;
-        case (location.href.indexOf("/alliance.php?forum_menu") > 0): page = new PageForum(); page.executer(); break;
-        case (location.href.indexOf("/alliance.php?Membres") > 0): page = new PageAlliance(); page.executer(); break;
-        case (location.href.indexOf("/Membre.php?Pseudo") > 0):
-        case (uri == "/Membre.php"): page = new PageProfil(boiteRadar); page.executer(); break;
-        case (uri == "/classementAlliance.php" && Utils.extractUrlParams()["alliance"] != "" && Utils.extractUrlParams()["alliance"] != undefined):
-          page = new PageDescription(boiteRadar); page.executer(); break;
-        case (location.href.indexOf("/ennemie.php?Attaquer") > 0):
-        case (location.href.indexOf("/ennemie.php?annuler") > 0):
-          page = new PageAttaquer(boiteComptePlus); page.executer(); break;
-        case (uri == "/ennemie.php" && location.search == ""):
-          $("#tabEnnemie tr:eq(0) th:eq(5)").after("<th class='centre'>Temps</th>");
-          $("#tabEnnemie tr:gt(0)").each((i, elt) => {
-            let distance = parseInt($(elt).find("td:eq(5)").text());
-            $(elt).find("td:eq(5)").after(`<td class='centre'>${Utils.intToTime(Math.ceil(Math.pow(0.9, monProfil.niveauRecherche[6]) * 637200 * (1 - Math.exp(-(distance / 350)))))}</td>`);
-          });
-          break;
-        default: break;
+  case (uri == "/construction.php"):
+    page = new PageConstruction(boiteComptePlus);
+    page.executer();
+    break;
+
+  case (uri == "/laboratoire.php"):
+    page = new PageLaboratoire(boiteComptePlus);
+    page.executer();
+    break;
+
+  case (uri == "/Ressources.php"):
+    page = new PageRessource(boiteComptePlus);
+    page.executer();
+    break;
+
+  case (uri == "/Armee.php"):
+    page = new PageArmee(boiteComptePlus);
+    page.executer();
+    break;
+
+  case (uri == "/commerce.php"):
+    page = new PageCommerce(boiteComptePlus);
+    page.executer();
+    break;
+
+  case (uri == "/messagerie.php"):
+    // Page messagerie standard Outiiil
+    page = new PageMessagerie();
+    page.executer();
+
+    // 🔽 Injection de l’exporteur (boite/MessagerieExport.js)
+    try {
+      if (window.BoiteMessagerieExport) {
+        // On supporte plusieurs signatures possibles
+        if (typeof BoiteMessagerieExport.init === 'function') {
+          BoiteMessagerieExport.init();
+        } else if (typeof BoiteMessagerieExport.boot === 'function') {
+          BoiteMessagerieExport.boot();
+        } else if (typeof BoiteMessagerieExport === 'function') {
+          // Classe → on tente executer() ou afficher()
+          const bme = new BoiteMessagerieExport();
+          if (typeof bme.executer === 'function') bme.executer();
+          else if (typeof bme.afficher === 'function') bme.afficher();
+        }
       }
+    } catch (e) {
+      console.error('[Outiiil] MessagerieExport error:', e);
+    }
+    break;
+
+  case (uri == "/alliance.php" && location.search == ""):
+  case (uri == "/chat.php"):
+    page = new PageChat();
+    page.executer();
+    break;
+
+  case (location.href.indexOf("/alliance.php?forum_menu") > 0):
+    page = new PageForum();
+    page.executer();
+    break;
+
+  case (location.href.indexOf("/alliance.php?Membres") > 0):
+    page = new PageAlliance();
+    page.executer();
+    break;
+
+  case (location.href.indexOf("/Membre.php?Pseudo") > 0):
+  case (uri == "/Membre.php"):
+    page = new PageProfil(boiteRadar);
+    page.executer();
+    break;
+
+  case (uri == "/classementAlliance.php"
+        && Utils.extractUrlParams()["alliance"] != ""
+        && Utils.extractUrlParams()["alliance"] != undefined):
+    page = new PageDescription(boiteRadar);
+    page.executer();
+    break;
+
+  case (location.href.indexOf("/ennemie.php?Attaquer") > 0):
+  case (location.href.indexOf("/ennemie.php?annuler") > 0):
+    page = new PageAttaquer(boiteComptePlus);
+    page.executer();
+    break;
+
+  case (uri == "/ennemie.php" && location.search == ""):
+    $("#tabEnnemie tr:eq(0) th:eq(5)").after("<th class='centre'>Temps</th>");
+    $("#tabEnnemie tr:gt(0)").each((i, elt) => {
+      let distance = parseInt($(elt).find("td:eq(5)").text());
+      $(elt).find("td:eq(5)").after(
+        `<td class='centre'>${Utils.intToTime(Math.ceil(Math.pow(0.9, monProfil.niveauRecherche[6]) * 637200 * (1 - Math.exp(-(distance / 350)))))}</td>`
+      );
+    });
+    break;
+
+  default:
+    break;
+}
+
     });
   }
 }();
