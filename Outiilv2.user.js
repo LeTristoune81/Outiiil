@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name        Outiil (GitHub build)
+// @name        Outiil
 // @author      Hraesvelg, modifié par Manitas
-// @version     2.1.1
+// @version     2.1.2
 // @description Outiil de Hraesvelg hébergé sur ton GitHub : https://github.com/LeTristoune81/Outiiil
 // @match       http://*.fourmizzz.fr/*
 // @run-at      document-end
