@@ -1,10 +1,10 @@
 // js/boite/MessageriePlus.js
 // Boîte Outiiil : Export Messagerie (Texte / BBCode Fzzz / Markdown Discord)
-// Porté depuis https://github.com/LeTristoune81/Messagerie – sans dépendance GM_*.
+// Portage robuste + bouton de secours en haut de /messagerie.php
 
 (function (g) {
   'use strict';
-  if (g.BoiteMessageriePlus) return; // garde-fou double init
+  if (g.BoiteMessageriePlus) return;
 
   /* ───────── Helpers ───────── */
 
@@ -20,9 +20,7 @@
   }
 
   async function copyText(text) {
-    try {
-      if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); return true; }
-    } catch {}
+    try { if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); return true; } } catch {}
     try {
       const ta = document.createElement('textarea');
       ta.value = text;
@@ -45,7 +43,25 @@
     catch { const m=/[?&]Pseudo=([^&]+)/.exec(href||''); return m?decodeURIComponent(m[1]):''; }
   };
 
-  // HTML -> BBCode (version Fourmizzz ou “générique”)
+  // Cherche les tableaux de conversation de manière tolérante
+  function findConversationTables() {
+    const sels = [
+      'tr.contenu_conversation td > table',
+      'table:has(tr[id^="message_"])',
+      '#centre table:has(td.message)',
+      'table table:has(.date_envoi)'
+    ];
+    const seen = new Set();
+    const out = [];
+    sels.forEach(sel => {
+      document.querySelectorAll(sel).forEach(t => {
+        if (!seen.has(t)) { seen.add(t); out.push(t); }
+      });
+    });
+    return out;
+  }
+
+  // HTML -> BBCode (Fourmizzz ou générique)
   function ze_HTML_to_BBcode(html, fourmizzz) {
     html = String(html).replace(/\n/g, '');
     if (fourmizzz) {
@@ -164,7 +180,7 @@
     return [...new Set(names)];
   }
 
-  // Ouvrir “voir les messages précédents”
+  // Ouvre tous les “voir les messages précédents”
   async function clickAllVoirPrec(table) {
     let btn;
     while ((btn = $$('a', table).find(a => /voir les messages pr[ée]c[ée]dents/i.test(a.textContent)))) {
@@ -180,9 +196,10 @@
     return b;
   }
 
-  // Injection
+  // Injection dans un tableau
   function inject(table) {
-    if (table.__zzInjected) return; table.__zzInjected = true;
+    if (!table || table.__zzInjected) return;
+    table.__zzInjected = true;
 
     const rBtn = table.insertRow(-1), cBtn = rBtn.insertCell(0);
     cBtn.colSpan = table.rows[0]?.cells.length || 2;
@@ -259,8 +276,25 @@
     };
   }
 
+  // Bouton de secours en haut de la page
+  function renderTopButton() {
+    if (document.getElementById('zz-export-top')) return;
+    const host = document.querySelector('#centre') || document.body;
+    const wrap = document.createElement('div');
+    wrap.id = 'zz-export-top';
+    wrap.style.textAlign = 'center';
+    wrap.style.margin = '10px 0';
+    const btn = document.createElement('button');
+    btn.className = 'zz-btn';
+    btn.textContent = 'Exporter la conversation';
+    btn.onclick = () => findConversationTables().forEach(inject);
+    wrap.appendChild(btn);
+    host.prepend(wrap);
+  }
+
   function boot() {
     if (!isMessagerie()) return;
+
     addStyle(`
       .zz-btn { background:#428bca; border:1px solid #357ebd; color:#fff; border-radius:4px; padding:6px 12px;
                 font-size:14px; cursor:pointer; transition:background .2s; }
@@ -274,15 +308,19 @@
       .zz-block textarea { width:100%; height:170px; font-family:monospace; white-space:pre-wrap; }
     `);
 
-    $$('tr.contenu_conversation td > table').forEach(inject);
-    new MutationObserver(() => $$('tr.contenu_conversation td > table').forEach(inject))
-      .observe(document.body, { childList:true, subtree:true });
+    const first = findConversationTables();
+    if (first.length) first.forEach(inject);
+    else renderTopButton();
+
+    // Observe les ajouts dynamiques (messages chargés par Outiiil / Fzzz)
+    new MutationObserver(() => {
+      const tables = findConversationTables();
+      if (tables.length) tables.forEach(inject);
+      else renderTopButton();
+    }).observe(document.body, { childList:true, subtree:true });
   }
 
-  /* ───────── Boîte publique ───────── */
-  class BoiteMessageriePlus {
-    afficher() { boot(); }
-  }
-
+  class BoiteMessageriePlus { afficher() { boot(); } }
   g.BoiteMessageriePlus = BoiteMessageriePlus;
+
 })(window);
