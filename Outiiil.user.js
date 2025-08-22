@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name        Outiiil
 // @author      WhiteRabbit
-// @version     2.1.6
+// @version     2.1.7
 // @description Outiil de Hraesvelg Modifié par WhiteRabbit
 // @match       http://*.fourmizzz.fr/*
 // @run-at      document-end
 // @noframes
 
-// @downloadURL https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiil.user.js
-// @updateURL   https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiil.user.js
+// @updateURL    https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiil.user.js
+// @downloadURL  https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiil.user.js
 
  // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.2.1/jquery.min.js
  // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
