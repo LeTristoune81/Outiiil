@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Outiiil
 // @author      WhiteRabbit
-// @version     2.1.7
+// @version     2.1.8
 // @description Outiil de Hraesvelg Modifié par WhiteRabbit
 // @match       http://*.fourmizzz.fr/*
 // @run-at      document-end
@@ -44,6 +44,8 @@
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/TraceurAlliance.js
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/TraceurJoueur.js
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Utils.js
+
+// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/MessageriePlus.js
 
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Boite.js
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Chasse.js
@@ -231,6 +233,7 @@ const DATEPICKER_OPTION = {
         case (uri == "/Armee.php"): page = new PageArmee(boiteComptePlus); page.executer(); break;
         case (uri == "/commerce.php"): page = new PageCommerce(boiteComptePlus); page.executer(); break;
         case (uri == "/messagerie.php"): page = new PageMessagerie(); page.executer(); break;
+        case (uri == "/messagerie.php"): page = new PageMessagerie(); page.executer(); try { if (window.BoiteMessageriePlus) new BoiteMessageriePlus().afficher(); } catch(e){ console.warn('[Outiiil] MessageriePlus init:', e); break;                                                                                                                                                                 
         case (uri == "/alliance.php" && location.search == ""):
         case (uri == "/chat.php"): page = new PageChat(); page.executer(); break;
         case (location.href.indexOf("/alliance.php?forum_menu") > 0): page = new PageForum(); page.executer(); break;
