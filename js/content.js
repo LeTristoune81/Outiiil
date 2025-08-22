@@ -30,7 +30,7 @@ const ORDRE_UNITE_CHASSE = [10, 3, 4, 1, 12, 7, 5, 13, 11, 9, 8, 6, 2];
 const ORDRE_XP_CHASSE    = [10, 3, 4, 1, 12, 7, 5];
 const REPLIQUE_CHASSE    = [0, 0, 0, 0.016, 0.093, 0.345, 0.577777778, 0.753, 0.837, 0.874, 0.937, 0.96, 0.989];
 // Image chat, messagerie de fourmizzz
-const LISTESMILEY1       = `
+//const LISTESMILEY1       = `
          <img src="${OUTIIL_ROOT}images/carte/rien.gif' width='1' height='39'>
          <img src="${OUTIIL_ROOT}images/smiley/ant_pouce.gif' onclick='addRaccourciSmiley("message","ant_pouce")'>
          <img src="${OUTIIL_ROOT}images/smiley/ant_smile.gif' onclick='addRaccourciSmiley("message","ant_smile")'>
@@ -51,7 +51,7 @@ const LISTESMILEY1       = `
          <img src="${OUTIIL_ROOT}images/smiley/ant_sad.gif' onclick='addRaccourciSmiley("message","ant_sad")'>
          <img src="${OUTIIL_ROOT}images/smiley/ant_mad.gif' onclick='addRaccourciSmiley("message","ant_mad")'>
          <img src="${OUTIIL_ROOT}images/smiley/ant_doctor.gif' onclick='addRaccourciSmiley("message","ant_doctor")'>`;
-const LISTESMILEY2       = `
+//const LISTESMILEY2       = `
          <img src="${OUTIIL_ROOT}images/carte/rien.gif' width='1' height='39'>
        <img onclick='addRaccourciSmiley("message","doctor")'   <img src="${OUTIIL_ROOT}images/smiley/doctor.gif'>
        <img onclick='addRaccourciSmiley("message","borg")'   <img src="${OUTIIL_ROOT}images/smiley/borg.gif'>
@@ -77,7 +77,7 @@ const LISTESMILEY2       = `
        <img onclick='addRaccourciSmiley("message","egypt")'   <img src="${OUTIIL_ROOT}images/smiley/egypt.gif'>
        <img onclick='addRaccourciSmiley("message","fool")'   <img src="${OUTIIL_ROOT}images/smiley/fool.gif'>
        <img onclick='addRaccourciSmiley("message","hat")'   <img src="${OUTIIL_ROOT}images/smiley/hat.gif'>`;
-const LISTESMILEY3       = `
+//const LISTESMILEY3       = `
          <img src="${OUTIIL_ROOT}images/carte/rien.gif' width='1' height='39'>
        <img onclick='addRaccourciSmiley("message","dead")'   <img src="${OUTIIL_ROOT}images/smiley/dead.gif'>
        <img onclick='addRaccourciSmiley("message","inv")'   <img src="${OUTIIL_ROOT}images/smiley/inv.gif'>
@@ -101,7 +101,7 @@ const LISTESMILEY3       = `
        <img onclick='addRaccourciSmiley("message","rip")'   <img src="${OUTIIL_ROOT}images/smiley/rip.gif'>
        <img onclick='addRaccourciSmiley("message","scooter")'   <img src="${OUTIIL_ROOT}images/smiley/scooter.gif'>
        <img onclick='addRaccourciSmiley("message","moto")'   <img src="${OUTIIL_ROOT}images/smiley/moto.gif'>`;
-const LISTESMILEY4       = `
+//const LISTESMILEY4       = `
         <img src="${OUTIIL_ROOT}images/carte/rien.gif' width='1' height='39'>
       <img onclick='addRaccourciSmiley("message","whip")'   <img src="${OUTIIL_ROOT}images/smiley/whip.gif'>
       <img onclick='addRaccourciSmiley("message","shades")'   <img src="${OUTIIL_ROOT}images/smiley/shades.gif'>
@@ -124,7 +124,7 @@ const LISTESMILEY4       = `
       <img onclick='addRaccourciSmiley("message","music")'   <img src="${OUTIIL_ROOT}images/smiley/music.gif'>
       <img onclick='addRaccourciSmiley("message","prison")' <img src="${OUTIIL_ROOT}images/smiley/prison.gif'>
       <img onclick='addRaccourciSmiley("message","piece")' <img src="${OUTIIL_ROOT}images/smiley/piece.gif'>`;
-const LISTESMILEY5       = `
+//const LISTESMILEY5       = `
       <img src="${OUTIIL_ROOT}images/carte/rien.gif' width='1' height='39'>
        <img onclick='addRaccourciSmiley("message","noel_etoile")' <img src="${OUTIIL_ROOT}images/smiley/noel_etoile.gif'>
        <img onclick='addRaccourciSmiley("message","noel_snowman10")' <img src="${OUTIIL_ROOT}images/smiley/noel_snowman10.gif'>
@@ -149,7 +149,7 @@ const LISTESMILEY5       = `
        <img onclick='addRaccourciSmiley("message","noel_bonnet")' <img src="${OUTIIL_ROOT}images/smiley/noel_bonnet.gif'>
        <img onclick='addRaccourciSmiley("message","noel_renne")' <img src="${OUTIIL_ROOT}images/smiley/noel_renne.gif'>
        <img onclick='addRaccourciSmiley("message","noel_renne3")' <img src="${OUTIIL_ROOT}images/smiley/noel_renne3.gif'>`;
-const LISTESMILEY6       = `
+//const LISTESMILEY6       = `
        <img src="${OUTIIL_ROOT}images/carte/rien.gif' width='1' height='39'>
        <img src="${OUTIIL_ROOT}images/smiley/dollar.gif' onclick='addRaccourciSmiley("message","dollar")'>
        <img src="${OUTIIL_ROOT}images/smiley/ninja.gif' onclick='addRaccourciSmiley("message","ninja")'>
