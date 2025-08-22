@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Outiiil
 // @author      WhiteRabbit
-// @version     2.1.11
+// @version     2.1.12
 // @description Outiil de Hraesvelg Modifié par WhiteRabbit
 // @match       http://*.fourmizzz.fr/*
 // @run-at      document-end
@@ -46,7 +46,7 @@
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/TraceurJoueur.js
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/class/Utils.js
 
- // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/MessagerieExport.js?v=2.1.7
+// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/MessagerieExport.js
 
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Boite.js
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Chasse.js
