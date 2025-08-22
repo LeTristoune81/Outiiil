@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Outiiil
 // @author      WhiteRabbit
-// @version     2.1.12
+// @version     2.1.13
 // @description Outiil de Hraesvelg Modifié par WhiteRabbit
 // @match       http://*.fourmizzz.fr/*
 // @run-at      document-end
@@ -258,29 +258,45 @@ switch (true) {
     break;
 
   case (uri == "/messagerie.php"):
-    // Page messagerie standard Outiiil
-    page = new PageMessagerie();
-    page.executer();
+  page = new PageMessagerie();
+  page.executer();
 
-    // 🔽 Injection de l’exporteur (boite/MessagerieExport.js)
-    try {
-      if (window.BoiteMessagerieExport) {
-        // On supporte plusieurs signatures possibles
-        if (typeof BoiteMessagerieExport.init === 'function') {
-          BoiteMessagerieExport.init();
-        } else if (typeof BoiteMessagerieExport.boot === 'function') {
+  // --- Export Messagerie : appel + fallback si @require pas encore dispo ---
+  (function () {
+    // Petit log pour debug
+    console.log('[Outiiil] Page Messagerie détectée.');
+
+    function bootExport() {
+      try {
+        if (typeof BoiteMessagerieExport !== 'undefined' && BoiteMessagerieExport && BoiteMessagerieExport.boot) {
+          console.log('[Outiiil] MessagerieExport: boot()');
           BoiteMessagerieExport.boot();
-        } else if (typeof BoiteMessagerieExport === 'function') {
-          // Classe → on tente executer() ou afficher()
-          const bme = new BoiteMessagerieExport();
-          if (typeof bme.executer === 'function') bme.executer();
-          else if (typeof bme.afficher === 'function') bme.afficher();
+        } else {
+          console.warn('[Outiiil] MessagerieExport non présent (require/caching). Tentative de chargement dynamique…');
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/MessagerieExport.js';
+          s.onload = function () {
+            try {
+              console.log('[Outiiil] MessagerieExport chargé dynamiquement → boot()');
+              BoiteMessagerieExport?.boot?.();
+            } catch (e) {
+              console.error('[Outiiil] Erreur boot MessagerieExport (dyn):', e);
+            }
+          };
+          s.onerror = function () { console.error('[Outiiil] Échec chargement dyn. MessagerieExport'); };
+          document.head.appendChild(s);
         }
+      } catch (e) {
+        console.error('[Outiiil] Erreur appel MessagerieExport:', e);
       }
-    } catch (e) {
-      console.error('[Outiiil] MessagerieExport error:', e);
     }
-    break;
+
+    // Appelle tout de suite et re-appelle après un petit délai (DOM qui bouge)
+    bootExport();
+    setTimeout(bootExport, 500);
+  })();
+  break;
+
 
   case (uri == "/alliance.php" && location.search == ""):
   case (uri == "/chat.php"):
