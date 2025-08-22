@@ -6,6 +6,7 @@
 /**
 * CONSTANTE
 */
+const OUTIIL_ROOT        = 'https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/';
 const VERSION            = "2.0.1.1";
 const CONSTRUCTION       = ["Champignonnière", "Entrepôt de Nourriture", "Entrepôt de Matériaux", "Couveuse", "Solarium", "Laboratoire", "Salle d'analyse", "Salle de combat", "Caserne", "Dôme", "Loge Impériale", "Etable à pucerons", "Etable à cochenilles"];
 const RECHERCHE          = ["Technique de ponte", "Bouclier Thoracique", "Armes", "Architecture", "Communication avec les animaux", "Vitesse de chasse", "Vitesse d'attaque", "Génétique", "Acide", "Poison"];
