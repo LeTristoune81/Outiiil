@@ -270,6 +270,7 @@
   }
 
   function boot() {
+    console.log('[MessagerieExport] boot OK');
     ensureStyle();
     scan();
     // Continue à écouter les mises à jour de la messagerie
