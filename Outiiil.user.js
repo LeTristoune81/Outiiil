@@ -1,17 +1,19 @@
 // ==UserScript==
-// @name        Outiil
-// @author      Hraesvelg, modifié par Manitas
+// @name        Outiiil
+// @author      WhiteRabbit
 // @version     2.1.5
-// @description Outiil de Hraesvelg hébergé sur ton GitHub : https://github.com/LeTristoune81/Outiiil
+// @description Outiil de Hraesvelg Modifié par WhiteRabbit
 // @match       http://*.fourmizzz.fr/*
 // @run-at      document-end
 // @noframes
 
-
+// @downloadURL https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiil.user.js
+// @updateURL   https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiil.user.js
 
  // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.2.1/jquery.min.js
  // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/globals/Assets.js
+
+ // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/globals/Assets.js
 
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/clipboard_1.7.1.js
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/datatables_1.10.16.js
