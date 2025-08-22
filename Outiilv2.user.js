@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name        Outiil
 // @author      Hraesvelg, modifié par Manitas
-// @version     2.1.2
+// @version     2.1.3
 // @description Outiil de Hraesvelg hébergé sur ton GitHub : https://github.com/LeTristoune81/Outiiil
 // @match       http://*.fourmizzz.fr/*
 // @run-at      document-end
 // @noframes
+
+// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/globals/Assets.js
 
  // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.2.1/jquery.min.js
  // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
