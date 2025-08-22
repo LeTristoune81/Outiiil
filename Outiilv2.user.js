@@ -11,7 +11,6 @@
 
  // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.2.1/jquery.min.js
  // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
- // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/globals/Assets.js
 
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/clipboard_1.7.1.js
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/lib/datatables_1.10.16.js
@@ -69,6 +68,36 @@
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Ressource.js
 // ==/UserScript==
 
+/* Alias sûr pour IMG_UPDATE – aucun let/const/var, pas d’accès TDZ */
+(function (g) {
+  // On n'utilise PAS l'identifiant IMG_UPDATE : on passe par la propriété global (window)
+  if (!Object.prototype.hasOwnProperty.call(g, 'IMG_UPDATE')) {
+    // Crée un alias paresseux : tant qu’une vraie valeur n’arrive pas, on pointe sur tes icônes existantes.
+    try {
+      Object.defineProperty(g, 'IMG_UPDATE', {
+        configurable: true,
+        enumerable: false,
+        get: function () {
+          return g.IMG_ACTUALISER || g.IMG_CHANGE || 'https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/actualize_on_01.png';
+        },
+        set: function (v) {
+          // Si plus tard un fichier définit explicitement IMG_UPDATE, on fige la valeur.
+          Object.defineProperty(g, 'IMG_UPDATE', {
+            value: v,
+            configurable: true,
+            enumerable: false,
+            writable: true
+          });
+        }
+      });
+    } catch (e) {
+      // En cas de sandbox exotique, on fait un simple fallback sans déclaration
+      try { g.IMG_UPDATE = g.IMG_ACTUALISER || g.IMG_CHANGE; } catch(_) {}
+    }
+  }
+})(window);
+
+
 /*
  * main.js — version Manitas, adapté GitHub
  * (logic identique, on ne touche pas aux const métiers)
@@ -118,23 +147,6 @@ const IMG_GAUCHE = "<img src='images/bouton/fleche-champs-gauche.gif' width='9' 
 const IMG_DROITE = "<img src='images/bouton/fleche-champs-droite.gif' width='9' height='15' class='o_vAlign'/>";
 const IMG_COPY   = "<img src='images/icone/feuille.gif' class='cliquable' title='Copier/Coller une armée' style='position:relative;top:3px' width='14' height='17'>";
 
-// ==== Ici modifié par Manitas — SAFE (anti-redeclare) ====
-(function(g){
-  g.OUTIIIL_IMG_CDN = g.OUTIIIL_IMG_CDN || "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/";
-  g.IMG_CHANGE      = g.IMG_CHANGE      || g.OUTIIIL_IMG_CDN + "change.png";
-  g.IMG_ACTUALISER  = g.IMG_ACTUALISER  || g.OUTIIIL_IMG_CDN + "actualize_on_01.png";
-  g.IMG_CRAYON      = g.IMG_CRAYON      || g.OUTIIIL_IMG_CDN + "crayon.gif";
-  g.IMG_CROIX       = g.IMG_CROIX       || g.OUTIIIL_IMG_CDN + "croix.png";
-  g.IMG_COPIER      = g.IMG_COPIER      || g.OUTIIIL_IMG_CDN + "copy.png";
-  g.IMG_HISTORIQUE  = g.IMG_HISTORIQUE  || g.OUTIIIL_IMG_CDN + "historique.png";
-  g.IMG_LIVRAISON   = g.IMG_LIVRAISON   || g.OUTIIIL_IMG_CDN + "livraison.png";
-  g.IMG_RADAR       = g.IMG_RADAR       || g.OUTIIIL_IMG_CDN + "radar.png";
-  g.IMG_SPRITE_MENU = g.IMG_SPRITE_MENU || g.OUTIIIL_IMG_CDN + "sprite_menu.png";
-  g.IMG_UTILITY     = g.IMG_UTILITY     || g.OUTIIIL_IMG_CDN + "utility.png";
-  g.IMG_DOWN        = g.IMG_DOWN        || g.OUTIIIL_IMG_CDN + "down.png";
-  g.IMG_UP          = g.IMG_UP          || g.OUTIIIL_IMG_CDN + "up.png";
-  g.IMG_OUTIIIL     = g.IMG_OUTIIIL     || g.OUTIIIL_IMG_CDN + "outiiil.png";
-})(window);
 
 // CSS depuis TON repo
 var cssFiles = [
