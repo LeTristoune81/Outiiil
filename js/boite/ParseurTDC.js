@@ -137,9 +137,7 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
 /* ===== Fenêtre déplaçable + position persistée (drag) ===== */
 (() => {
   const POS_KEY = 'OutiiilTDC:pos';
-
   const root = (typeof shadow !== 'undefined' && shadow && typeof shadow.querySelector === 'function') ? shadow : document;
-
   const panelEl  = root.querySelector('#panel');
   const headerEl = root.querySelector('.hdr');
   if (!panelEl || !headerEl) return;
@@ -228,10 +226,8 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
   });
 
   window.addEventListener('resize', clampIntoViewport);
-
   loadPos();
 })();
-
 
 /* ==================== Events ==================== */
 $('#clear').addEventListener('click',()=>{$('#raw').value=''; setStatus(''); clearTables(); disableCopy();});
@@ -270,10 +266,6 @@ function parseAll(text){
   const lines=text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
   const blocks=[]; let current=null;
 
-  // ancres de date
-  let lastAbsoluteDate = null;  // "dd/mm/yyyy"
-  let currentDateCtx   = null;  // "dd/mm/yyyy" (bloc courant)
-
   // dates / balises
   const reDate1=/^(?:—\s*)?(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})$/;   // 17/08/2025 08:42
   const reHier=/^(?:—\s*)?Hier\s+à\s+(\d{2}:\d{2})$/i;                // Hier à 01:57
@@ -283,10 +275,10 @@ function parseAll(text){
 
   // joueur / action (+ espaces fines, NBSP, en-dash, accents/pluriels)
   const rePlayer=new RegExp(
-    '^([^()]+)\\(' +                 // Pseudo
-    '([A-Za-zÀ-ÖØ-öø-ÿ0-9\\-]+)' +   // Alliance
+    '^([^()]+)\\(' +
+    '([A-Za-zÀ-ÖØ-öø-ÿ0-9\\-]+)' +
     '\\):\\s*' +
-    '([+\\-–]\\s*\\d[\\d\\s\\u00A0\\u202F]*)\\s+' + // +/- montant
+    '([+\\-–]\\s*\\d[\\d\\s\\u00A0\\u202F]*)\\s+' +
     '(' +
       'tdc|TDC|' +
       'fourmiliere|fourmilière|' +
@@ -301,43 +293,35 @@ function parseAll(text){
     if(reNoise.test(raw)) continue;
     let m;
 
-    // Date explicite
+    // Date explicite => telle quelle
     if(m=raw.match(reDate1)){
       const d=m[1], t=m[2];
-      lastAbsoluteDate = d;
-      currentDateCtx   = d;
       const tsMs = frToMs(d, t);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
       continue;
     }
 
-    // Hier à HH:MM (ancré sur dernière date absolue, sinon aujourd'hui)
+    // Hier à HH:MM => J-1 par rapport à AUJOURD'HUI (pas la dernière date vue)
     if(m=raw.match(reHier)){
-      const anchor   = lastAbsoluteDate || todayFR();
-      const resolved = shiftDate(anchor, -1);
-      currentDateCtx = resolved;
+      const resolved = shiftDate(todayFR(), -1);
       const tsMs = frToMs(resolved, m[1]);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
       continue;
     }
 
-    // Aujourd'hui à HH:MM (ancré sur dernière absolue si dispo, sinon aujourd'hui)
+    // Aujourd'hui à HH:MM => aujourd'hui
     if(m=raw.match(reAuj)){
-      const resolved = lastAbsoluteDate || todayFR();
-      currentDateCtx = resolved;
-      const tsMs = frToMs(resolved, m[1]);
+      const tsMs = frToMs(todayFR(), m[1]);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
       continue;
     }
 
-    // HH:MM seul => reprend la date du bloc courant (ou dernière absolue, ou aujourd'hui)
+    // HH:MM seul => aujourd'hui
     if(m=raw.match(reTimeOnly)){
-      const base = currentDateCtx || lastAbsoluteDate || todayFR();
-      currentDateCtx = base;
-      const tsMs = frToMs(base, m[1]);
+      const tsMs = frToMs(todayFR(), m[1]);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
       continue;
@@ -346,7 +330,7 @@ function parseAll(text){
     // Ligne joueur
     if(m=raw.match(rePlayer)){
       if(!current){
-        const base = currentDateCtx || lastAbsoluteDate || todayFR();
+        const base = todayFR();
         const tsMs = frToMs(base, '00:00');
         current={tsLabel:`${base} 00:00`, ts:tsMs, entries:[]};
         blocks.push(current);
@@ -360,7 +344,6 @@ function parseAll(text){
       current.entries.push({name,ally,signAmt,kind,before,after,raw});
       continue;
     }
-    // lignes ignorées: on passe
   }
 
   const tx=[], orph=[], ups=[];
@@ -570,7 +553,7 @@ function todayFR(){
   const d = new Date();
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
 }
-// J+dd à partir d'une date FR (LOCAL, pas UTC)
+// J+dd à partir d'une date FR (LOCAL)
 function shiftDate(fr,dd){
   const [d,m,y]=fr.split('/').map(n=>+n);
   const dt=new Date(y,m-1,d);
@@ -595,7 +578,7 @@ function dispDate(ms){
 }
 // nombre robuste (garde le signe, gère NBSP \u00A0 et fines \u202F, normalise en-dash)
 function num(s){
-  const raw=String(s).replace(/[\u00A0\u202F\s]+/g,''); // enlève toutes les variantes d'espaces
+  const raw=String(s).replace(/[\u00A0\u202F\s]+/g,'');
   const m=raw.match(/^([+\-–]?)(\d.*)$/);
   if(!m) return Number(raw.replace(/[^\d]/g,''));
   const sign=(m[1]==='–')?'-':m[1];
@@ -609,7 +592,6 @@ async function copyToClipboard(text){
   try{await navigator.clipboard.writeText(text); setStatus('ASCII copié ✅');}
   catch{const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); setStatus('ASCII copié (fallback) ✅');}
 }
-function setStatus(m){$('#status').textContent=m;}
 // normalise le type
 function normKind(k){
   if (/tdc/i.test(k)) return 'tdc';
