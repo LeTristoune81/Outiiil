@@ -17,7 +17,7 @@ const shadow=host.attachShadow({mode:'open'});
 shadow.innerHTML=`
 <style>
 :host{all:initial}
-.panel{position:fixed;right:18px;bottom:18px;width:1000px;max-height:82vh;overflow:hidden;background:#111723;color:#e7ecf3;border:1px solid #1b2332;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.35);display:none;font-size:15px}
+.panel{position:fixed;right:18px;bottom:18px;width:1000px;max-height:90vh;overflow:hidden;background:#111723;color:#e7ecf3;border:1px solid #1b2332;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.35);display:none;font-size:15px}
 .show{display:block}
 .hdr{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#0f182b;border-bottom:1px solid #1b2332}
 .title{font-size:16px;font-weight:700}
@@ -39,6 +39,11 @@ th{position:sticky;top:0;background:#0f182b;z-index:1}
 .mono{font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace}
 kbd{background:#0c1526;border:1px solid #1b2332;border-radius:6px;padding:1px 5px;font-size:11px}
 .footer{padding:8px 10px;color:#9db0c9;font-size:11px;border-top:1px solid #1b2332;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+/* poignée de redimensionnement */
+.resizer{position:absolute;right:6px;bottom:6px;width:14px;height:14px;cursor:nwse-resize;opacity:.9}
+.resizer::before,.resizer::after{content:"";position:absolute;border-color:#1b2332;border-style:solid;opacity:.8}
+.resizer::before{right:0;bottom:0;border-width:0 2px 2px 0;width:12px;height:12px;border-radius:0 0 2px 0}
+.resizer::after{right:3px;bottom:3px;border-width:0 2px 2px 0;width:9px;height:9px;border-radius:0 0 2px 0}
 </style>
 
 <div id="panel" class="panel">
@@ -124,23 +129,53 @@ APP
     <span>Export Toolzzz : en-têtes centrés, points gris, Net vert/rouge.</span>
     <span class="muted">Tout hors-ligne • Format FR supporté.</span>
   </div>
+
+  <div id="resizerBR" class="resizer" title="Redimensionner"></div>
 </div>
 `;
 
 const $=(s)=>shadow.querySelector(s);
 const fmt=new Intl.NumberFormat('fr-FR');
 
-const toggle = ()=>$('#panel').classList.toggle('show');
+/* === Ajuste la hauteur utile du tableau visible === */
+function updateScrollHeights(){
+  const panel = $('#panel');
+  if (!panel || !panel.classList.contains('show')) return;
+  const rectP = panel.getBoundingClientRect();
+
+  // section visible à droite
+  const panels = ['tx','agg','alli','ups','orph'].map(k=>$('#panel-'+k));
+  const shown = panels.find(p => p && p.style.display !== 'none');
+  if(!shown) return;
+
+  const sc = shown.querySelector('.scroll');
+  if(!sc) return;
+
+  const top = sc.getBoundingClientRect().top - rectP.top;
+  const avail = Math.max(120, rectP.height - top - 12);
+  sc.style.maxHeight = avail + 'px';
+}
+
+/* toggle avec recalage du scroll quand on ouvre */
+let toggle = ()=>{
+  const p=$('#panel');
+  const vis=p.classList.toggle('show');
+  if(vis) requestAnimationFrame(updateScrollHeights);
+};
+
 $('#close').addEventListener('click',toggle);
 window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T')){ e.preventDefault(); toggle(); }});
 
-/* ===== Fenêtre déplaçable + position persistée (drag) ===== */
+/* ===== Fenêtre déplaçable + position persistée (drag) + redimensionnable ===== */
 (() => {
   const POS_KEY = 'OutiiilTDC:pos';
+  const SIZ_KEY = 'OutiiilTDC:size';
+
   const root = (typeof shadow !== 'undefined' && shadow && typeof shadow.querySelector === 'function') ? shadow : document;
   const panelEl  = root.querySelector('#panel');
   const headerEl = root.querySelector('.hdr');
-  if (!panelEl || !headerEl) return;
+  const resEl    = root.querySelector('#resizerBR');
+  if (!panelEl || !headerEl || !resEl) return;
 
   headerEl.style.cursor = 'move';
 
@@ -188,8 +223,25 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
     panelEl.style.bottom = '18px';
   }
 
-  let dragging = false, offsetX = 0, offsetY = 0;
+  // ---- Taille persistée
+  function loadSize(){
+    try{
+      const s = localStorage.getItem(SIZ_KEY);
+      if(!s) return false;
+      const {w,h} = JSON.parse(s)||{};
+      if(Number.isFinite(w)) panelEl.style.width  = w+'px';
+      if(Number.isFinite(h)) panelEl.style.height = h+'px';
+      return true;
+    }catch(e){ return false; }
+  }
+  function saveSize(w,h){
+    const curW = Math.round(parseFloat(panelEl.style.width)  || panelEl.getBoundingClientRect().width);
+    const curH = Math.round(parseFloat(panelEl.style.height) || panelEl.getBoundingClientRect().height);
+    localStorage.setItem(SIZ_KEY, JSON.stringify({w:curW, h:curH}));
+  }
 
+  // ---- Drag position
+  let dragging = false, offsetX = 0, offsetY = 0;
   headerEl.addEventListener('mousedown', (e) => {
     if (e.button !== 0) return;
     dragging = true;
@@ -201,7 +253,6 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
     headerEl.style.cursor = 'grabbing';
     e.preventDefault();
   });
-
   window.addEventListener('mousemove', (e) => {
     if (!dragging) return;
     let left = e.clientX - offsetX;
@@ -212,24 +263,60 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
     panelEl.style.left = left + 'px';
     panelEl.style.top  = top  + 'px';
   });
-
   window.addEventListener('mouseup', () => {
     if (!dragging) return;
     dragging = false;
     headerEl.style.cursor = 'move';
     savePos();
   });
+  headerEl.addEventListener('dblclick', (e) => { e.preventDefault(); resetPosBottomRight(); });
 
-  headerEl.addEventListener('dblclick', (e) => {
+  // ---- Resize (poignée bas-droite)
+  let resizing=false, sx=0, sy=0, sw=0, sh=0;
+  resEl.addEventListener('mousedown', (e)=>{
+    if(e.button!==0) return;
     e.preventDefault();
-    resetPosBottomRight();
+    const r = panelEl.getBoundingClientRect();
+    resizing = true;
+    sx = e.clientX; sy = e.clientY; sw = r.width; sh = r.height;
+    document.body.style.userSelect='none';
+  });
+  window.addEventListener('mousemove', (e)=>{
+    if(!resizing) return;
+    // limites raisonnables
+    const maxW = Math.min(window.innerWidth - 36, 1600);
+    const maxH = Math.min(window.innerHeight - 36, 1200);
+    let w = sw + (e.clientX - sx);
+    let h = sh + (e.clientY - sy);
+    w = Math.max(520, Math.min(w, maxW));
+    h = Math.max(280, Math.min(h, maxH));
+    panelEl.style.width  = w + 'px';
+    panelEl.style.height = h + 'px';
+    clampIntoViewport();
+    updateScrollHeights();
+  });
+  window.addEventListener('mouseup', ()=>{
+    if(!resizing) return;
+    resizing=false;
+    document.body.style.userSelect='';
+    saveSize();
   });
 
-  window.addEventListener('resize', clampIntoViewport);
+  // Recalage si la fenêtre change de taille
+  window.addEventListener('resize', ()=>{ clampIntoViewport(); updateScrollHeights(); });
+
+  // Au chargement : taille puis position, puis calcule la zone scroll si panel visible
+  loadSize();
   loadPos();
+  requestAnimationFrame(updateScrollHeights);
 })();
 
 /* ==================== Events ==================== */
+function setStatus(m){$('#status').textContent=m;}
+function clearTables(){['tblTx','tblAgg','tblAlli','tblUps','tblOrph'].forEach(id=>$('#'+id).innerHTML='');}
+function disableCopy(){['copyTx','copyAgg','copyAlli','copyUps','copyOrph'].forEach(id=>$('#'+id).disabled=true);}
+function enableCopy(){['copyTx','copyAgg','copyAlli','copyUps','copyOrph'].forEach(id=>$('#'+id).disabled=false);}
+
 $('#clear').addEventListener('click',()=>{$('#raw').value=''; setStatus(''); clearTables(); disableCopy();});
 $('#sample').addEventListener('click',()=>$('#raw').value=SAMPLE.trim());
 shadow.querySelectorAll('.tab').forEach(tab=>{
@@ -238,6 +325,7 @@ shadow.querySelectorAll('.tab').forEach(tab=>{
     tab.classList.add('active');
     const k=tab.dataset.tab;
     ['tx','agg','alli','ups','orph'].forEach(x=>{$(`#panel-${x}`).style.display=(x===k?'block':'none');});
+    requestAnimationFrame(updateScrollHeights);
   });
 });
 const filters={player:'',ally:''};
@@ -248,18 +336,13 @@ $('#fClear').addEventListener('click',()=>{filters.player='';filters.ally='';$('
 $('#analyze').addEventListener('click',()=>{
   const txt=$('#raw').value;
   if(!txt.trim()){ setStatus('Colle du texte à analyser.'); return; }
-  try{ renderAll(parseAll(txt)); }catch(err){ setStatus('Erreur: '+(err?.message||err)); console.error(err); }
+  try{ renderAll(parseAll(txt)); requestAnimationFrame(updateScrollHeights); }catch(err){ setStatus('Erreur: '+(err?.message||err)); console.error(err); }
 });
 $('#copyTx').addEventListener('click',()=>copyToClipboard(wrapCode(buildAsciiTx(view.tx))));
 $('#copyAgg').addEventListener('click',()=>copyToClipboard(wrapCode(buildAsciiAgg(view.agg))));
 $('#copyAlli').addEventListener('click',()=>copyToClipboard(wrapCode(buildAsciiAlli(view.alli))));
 $('#copyUps').addEventListener('click',()=>copyToClipboard(wrapCode(buildAsciiUps(view.ups))));
 $('#copyOrph').addEventListener('click',()=>copyToClipboard(wrapCode(buildAsciiOrph(view.orph))));
-
-function setStatus(m){$('#status').textContent=m;}
-function clearTables(){['tblTx','tblAgg','tblAlli','tblUps','tblOrph'].forEach(id=>$('#'+id).innerHTML='');}
-function disableCopy(){['copyTx','copyAgg','copyAlli','copyUps','copyOrph'].forEach(id=>$('#'+id).disabled=true);}
-function enableCopy(){['copyTx','copyAgg','copyAlli','copyUps','copyOrph'].forEach(id=>$('#'+id).disabled=false);}
 
 /* ==================== Parsing ==================== */
 function parseAll(text){
@@ -302,7 +385,7 @@ function parseAll(text){
       continue;
     }
 
-    // Hier à HH:MM => J-1 par rapport à AUJOURD'HUI (pas la dernière date vue)
+    // Hier à HH:MM => J-1 par rapport à AUJOURD'HUI
     if(m=raw.match(reHier)){
       const resolved = shiftDate(todayFR(), -1);
       const tsMs = frToMs(resolved, m[1]);
@@ -602,7 +685,7 @@ function normKind(k){
 /* ==================== API Outiiil ==================== */
 window.OutiiilTDC = (function(){
   const api = {};
-  api.open   = ()=>{ $('#panel').classList.add('show'); };
+  api.open   = ()=>{ $('#panel').classList.add('show'); requestAnimationFrame(updateScrollHeights); };
   api.close  = ()=>{ $('#panel').classList.remove('show'); };
   api.toggle = ()=>{ toggle(); };
   api.fill   = (txt)=>{ $('#raw').value = txt||''; };
