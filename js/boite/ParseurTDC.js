@@ -138,19 +138,14 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
 (() => {
   const POS_KEY = 'OutiiilTDC:pos';
 
-  // Récupère le root à utiliser: shadow root si dispo, sinon document
-  const root = (typeof shadow !== 'undefined' && shadow && typeof shadow.querySelector === 'function')
-    ? shadow
-    : document;
+  const root = (typeof shadow !== 'undefined' && shadow && typeof shadow.querySelector === 'function') ? shadow : document;
 
   const panelEl  = root.querySelector('#panel');
   const headerEl = root.querySelector('.hdr');
-  if (!panelEl || !headerEl) return; // UI pas encore montée
+  if (!panelEl || !headerEl) return;
 
-  // Indice visuel
   headerEl.style.cursor = 'move';
 
-  // --------- Persistance / contraintes écran ----------
   function clampIntoViewport() {
     const rect = panelEl.getBoundingClientRect();
     const W = window.innerWidth, H = window.innerHeight;
@@ -195,16 +190,14 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
     panelEl.style.bottom = '18px';
   }
 
-  // --------- Drag & drop sur l’entête ----------
   let dragging = false, offsetX = 0, offsetY = 0;
 
   headerEl.addEventListener('mousedown', (e) => {
-    if (e.button !== 0) return; // seulement clic gauche
+    if (e.button !== 0) return;
     dragging = true;
     const r = panelEl.getBoundingClientRect();
     offsetX = e.clientX - r.left;
     offsetY = e.clientY - r.top;
-    // passe en positionnement left/top
     panelEl.style.right  = 'auto';
     panelEl.style.bottom = 'auto';
     headerEl.style.cursor = 'grabbing';
@@ -229,16 +222,13 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
     savePos();
   });
 
-  // Double-clic sur l’entête → reset en bas/droite
   headerEl.addEventListener('dblclick', (e) => {
     e.preventDefault();
     resetPosBottomRight();
   });
 
-  // Recalage si la fenêtre change de taille
   window.addEventListener('resize', clampIntoViewport);
 
-  // Au chargement du script : essaie d’appliquer la position mémorisée
   loadPos();
 })();
 
@@ -278,24 +268,99 @@ function enableCopy(){['copyTx','copyAgg','copyAlli','copyUps','copyOrph'].forEa
 /* ==================== Parsing ==================== */
 function parseAll(text){
   const lines=text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  const blocks=[]; let current=null,lastDate=null;
-  const reDate1=/^(?:—\s*)?(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})$/;
-  const reHier=/^(?:—\s*)?Hier\s+à\s+(\d{2}:\d{2})$/i;
-  const reTimeOnly=/^(?:—\s*)?(\d{2}:\d{2})$/;
+  const blocks=[]; let current=null;
+
+  // ancres de date
+  let lastAbsoluteDate = null;  // "dd/mm/yyyy"
+  let currentDateCtx   = null;  // "dd/mm/yyyy" (bloc courant)
+
+  // dates / balises
+  const reDate1=/^(?:—\s*)?(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})$/;   // 17/08/2025 08:42
+  const reHier=/^(?:—\s*)?Hier\s+à\s+(\d{2}:\d{2})$/i;                // Hier à 01:57
+  const reAuj=/^(?:—\s*)?Aujourd(?:'|’)?hui\s+à\s+(\d{2}:\d{2})$/i;   // Aujourd’hui à 05:25
+  const reTimeOnly=/^(?:—\s*)?(\d{2}:\d{2})$/;                        // 05:25
   const reNoise=/^(Fourmizzz\s+S1|APP)$/i;
-  const rePlayer=/^([^()]+)\(([A-Za-zÀ-ÖØ-öø-ÿ0-9\-]+)\):\s*([+\-]\d[\d\s]*)\s+(tdc|fourmiliere|technologie)\s*\|\s*(\d[\d\s]*)\s*=>\s*(\d[\d\s]*)$/i;
+
+  // joueur / action (+ espaces fines, NBSP, en-dash, accents/pluriels)
+  const rePlayer=new RegExp(
+    '^([^()]+)\\(' +                 // Pseudo
+    '([A-Za-zÀ-ÖØ-öø-ÿ0-9\\-]+)' +   // Alliance
+    '\\):\\s*' +
+    '([+\\-–]\\s*\\d[\\d\\s\\u00A0\\u202F]*)\\s+' + // +/- montant
+    '(' +
+      'tdc|TDC|' +
+      'fourmiliere|fourmilière|' +
+      'technologie|technologies' +
+    ')' +
+    '\\s*\\|\\s*' +
+    '(\\d[\\d\\s\\u00A0\\u202F]*)\\s*=>\\s*(\\d[\\d\\s\\u00A0\\u202F]*)' +
+    '$','i'
+  );
 
   for(const raw of lines){
     if(reNoise.test(raw)) continue;
     let m;
-    if(m=raw.match(reDate1)){ const [_,d,t]=m; lastDate=d; current={tsLabel:raw.replace(/^—\s*/,''), tsISO:toISO(d+' '+t), entries:[]}; blocks.push(current); continue; }
-    if(m=raw.match(reHier)){ if(!lastDate) lastDate=todayFR(); const dt=shiftDate(lastDate,-1); current={tsLabel:'Hier à '+m[1], tsISO:toISO(dt+' '+m[1]), entries:[]}; blocks.push(current); continue; }
-    if(m=raw.match(reTimeOnly)){ if(!lastDate) lastDate=todayFR(); current={tsLabel:m[1], tsISO:toISO(lastDate+' '+m[1]), entries:[]}; blocks.push(current); continue; }
-    if(m=raw.match(rePlayer)){
-      if(!current){ const d=lastDate||todayFR(); const hh='00:00'; current={tsLabel:d+' '+hh, tsISO:toISO(d+' '+hh), entries:[]}; blocks.push(current); }
-      const name=m[1].trim(), ally=m[2].trim(), signAmt=num(m[3]), kind=m[4].toLowerCase(), before=num(m[5]), after=num(m[6]);
-      current.entries.push({name,ally,signAmt,kind,before,after,raw});
+
+    // Date explicite
+    if(m=raw.match(reDate1)){
+      const d=m[1], t=m[2];
+      lastAbsoluteDate = d;
+      currentDateCtx   = d;
+      const tsMs = frToMs(d, t);
+      current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
+      blocks.push(current);
+      continue;
     }
+
+    // Hier à HH:MM (ancré sur dernière date absolue, sinon aujourd'hui)
+    if(m=raw.match(reHier)){
+      const anchor   = lastAbsoluteDate || todayFR();
+      const resolved = shiftDate(anchor, -1);
+      currentDateCtx = resolved;
+      const tsMs = frToMs(resolved, m[1]);
+      current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
+      blocks.push(current);
+      continue;
+    }
+
+    // Aujourd'hui à HH:MM (ancré sur dernière absolue si dispo, sinon aujourd'hui)
+    if(m=raw.match(reAuj)){
+      const resolved = lastAbsoluteDate || todayFR();
+      currentDateCtx = resolved;
+      const tsMs = frToMs(resolved, m[1]);
+      current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
+      blocks.push(current);
+      continue;
+    }
+
+    // HH:MM seul => reprend la date du bloc courant (ou dernière absolue, ou aujourd'hui)
+    if(m=raw.match(reTimeOnly)){
+      const base = currentDateCtx || lastAbsoluteDate || todayFR();
+      currentDateCtx = base;
+      const tsMs = frToMs(base, m[1]);
+      current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
+      blocks.push(current);
+      continue;
+    }
+
+    // Ligne joueur
+    if(m=raw.match(rePlayer)){
+      if(!current){
+        const base = currentDateCtx || lastAbsoluteDate || todayFR();
+        const tsMs = frToMs(base, '00:00');
+        current={tsLabel:`${base} 00:00`, ts:tsMs, entries:[]};
+        blocks.push(current);
+      }
+      const name=m[1].trim(),
+            ally=m[2].trim(),
+            signAmt=num(m[3]),
+            kind=normKind(m[4]),
+            before=num(m[5]),
+            after=num(m[6]);
+      current.entries.push({name,ally,signAmt,kind,before,after,raw});
+      continue;
+    }
+    // lignes ignorées: on passe
   }
 
   const tx=[], orph=[], ups=[];
@@ -305,20 +370,20 @@ function parseAll(text){
       if(e.kind==='tdc'){ (e.signAmt>0?gains:losses).push(e); }
       else others.push(e);
     }
-    others.forEach(u=>ups.push({ts:b.tsISO, tsLabel:b.tsLabel, player:u.name, ally:u.ally, type:u.kind, delta:Math.abs(u.signAmt), before:u.before, after:u.after}));
+    others.forEach(u=>ups.push({ts:b.ts, tsLabel:b.tsLabel, player:u.name, ally:u.ally, type:u.kind, delta:Math.abs(u.signAmt), before:u.before, after:u.after}));
     const usedLoss=new Set(), usedGain=new Set();
 
     for(let gi=0; gi<gains.length; gi++){
       const g=gains[gi], amt=Math.abs(g.signAmt); let match=-1;
       for(let li=0; li<losses.length; li++){ if(usedLoss.has(li)) continue; const l=losses[li]; if(Math.abs(l.signAmt)===amt){ match=li; break; } }
       if(match>=0){ const l=losses[match]; usedLoss.add(match); usedGain.add(gi);
-        tx.push({ts:b.tsISO, tsLabel:b.tsLabel, amount:amt,
+        tx.push({ts:b.ts, tsLabel:b.tsLabel, amount:amt,
           winner:g.name, wAlly:g.ally, wBefore:g.before, wAfter:g.after,
           loser:l.name, lAlly:l.ally, lBefore:l.before, lAfter:l.after,
           block:idx, status:'apparié'}); }
     }
-    gains.forEach((g,gi)=>{ if(!usedGain.has(gi)) orph.push({ts:b.tsISO, tsLabel:b.tsLabel, who:g.name, ally:g.ally, signAmt:g.signAmt, before:g.before, after:g.after, kind:'tdc', block:idx}); });
-    losses.forEach((l,li)=>{ if(!usedLoss.has(li)) orph.push({ts:b.tsISO, tsLabel:b.tsLabel, who:l.name, ally:l.ally, signAmt:l.signAmt, before:l.before, after:l.after, kind:'tdc', block:idx}); });
+    gains.forEach((g,gi)=>{ if(!usedGain.has(gi)) orph.push({ts:b.ts, tsLabel:b.tsLabel, who:g.name, ally:g.ally, signAmt:g.signAmt, before:g.before, after:g.after, kind:'tdc', block:idx}); });
+    losses.forEach((l,li)=>{ if(!usedLoss.has(li)) orph.push({ts:b.ts, tsLabel:b.tsLabel, who:l.name, ally:l.ally, signAmt:l.signAmt, before:l.before, after:l.after, kind:'tdc', block:idx}); });
   });
 
   const aggMap=new Map();
@@ -500,20 +565,57 @@ function buildAsciiOrph(list){
 }
 
 /* ==================== Helpers ==================== */
-function todayFR(){const d=new Date();return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;}
-function shiftDate(fr,dd){const [d,m,y]=fr.split('/').map(n=>+n);const dt=new Date(Date.UTC(y,m-1,d));dt.setUTCDate(dt.getUTCDate()+dd);return `${String(dt.getUTCDate()).padStart(2,'0')}/${String(dt.getUTCMonth()+1).padStart(2,'0')}/${dt.getUTCFullYear()}`;}
-function toISO(frDT){const [date,time]=frDT.split(/\s+/);const [d,m,y]=date.split('/').map(Number);const [H,M]=time.split(':').map(Number);return new Date(y,m-1,d,H,M,0,0).toISOString();}
-function dispDate(iso){const d=new Date(iso);return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
-function num(s){return Number(String(s).replace(/\s+/g,''));}
+// date du jour au format FR
+function todayFR(){
+  const d = new Date();
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+// J+dd à partir d'une date FR (LOCAL, pas UTC)
+function shiftDate(fr,dd){
+  const [d,m,y]=fr.split('/').map(n=>+n);
+  const dt=new Date(y,m-1,d);
+  dt.setDate(dt.getDate()+dd);
+  return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}/${dt.getFullYear()}`;
+}
+// FR "dd/mm/yyyy" + "HH:MM" -> timestamp (ms) LOCAL
+function frToMs(frDate, hhmm){
+  const [d,m,y]=frDate.split('/').map(Number);
+  const [H,M]=hhmm.split(':').map(Number);
+  return new Date(y,m-1,d,H,M,0,0).getTime();
+}
+// timestamp (ms) -> "dd/mm/yyyy HH:MM"
+function dispDate(ms){
+  const d=new Date(ms);
+  const dd=String(d.getDate()).padStart(2,'0');
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const yy=d.getFullYear();
+  const HH=String(d.getHours()).padStart(2,'0');
+  const MM=String(d.getMinutes()).padStart(2,'0');
+  return `${dd}/${mm}/${yy} ${HH}:${MM}`;
+}
+// nombre robuste (garde le signe, gère NBSP \u00A0 et fines \u202F, normalise en-dash)
+function num(s){
+  const raw=String(s).replace(/[\u00A0\u202F\s]+/g,''); // enlève toutes les variantes d'espaces
+  const m=raw.match(/^([+\-–]?)(\d.*)$/);
+  if(!m) return Number(raw.replace(/[^\d]/g,''));
+  const sign=(m[1]==='–')?'-':m[1];
+  return Number(sign + m[2].replace(/[^\d]/g,''));
+}
 function esc(s){return String(s).replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
-function minDate(a,b){if(!a)return b;return (new Date(a)<new Date(b))?a:b;}
-function maxDate(a,b){if(!a)return b;return (new Date(a)>new Date(b))?a:b;}
+function minDate(a,b){ if(a==null) return b; return Math.min(a,b); }
+function maxDate(a,b){ if(a==null) return b; return Math.max(a,b); }
 function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
 async function copyToClipboard(text){
   try{await navigator.clipboard.writeText(text); setStatus('ASCII copié ✅');}
   catch{const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); setStatus('ASCII copié (fallback) ✅');}
 }
 function setStatus(m){$('#status').textContent=m;}
+// normalise le type
+function normKind(k){
+  if (/tdc/i.test(k)) return 'tdc';
+  if (/fourmi/i.test(k)) return 'fourmiliere';
+  return 'technologie';
+}
 
 /* ==================== API Outiiil ==================== */
 window.OutiiilTDC = (function(){
@@ -536,8 +638,8 @@ APP
 Christheall(TRID): +7 674 044 730 tdc | 19 994 459 168 => 27 668 503 898
 mamandepatateetdragon(NOIR): -7 674 044 730 tdc | 38 370 223 653 => 30 696 178 923
 — 08:12
-panoupanou(-FADA): +1 fourmiliere | 447 => 448
-— 15/08/2025 07:56
+panoupanou(-FADA): +1 fourmilière | 447 => 448
+— Aujourd’hui à 05:25
 lyse-mo(-FADA): +1 technologie | 241 => 242
 `;
 
