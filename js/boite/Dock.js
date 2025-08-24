@@ -170,8 +170,8 @@ class Dock {
       if (!$tb.length) return;
       $tb.find('.o_toolbarItem[title="Traceur"], .o_toolbarItem[title="Carte"], #o_itemTraceur, #o_itemMap')
          .closest(".o_toolbarItem").remove();
-      o_injectUpdateButton($tb);
-      o_injectTdcButton($tb);
+if (typeof o_injectUpdateButton === 'function') { o_injectUpdateButton($tb); }
+if (typeof o_injectTdcButton === 'function')    { o_injectTdcButton($tb); }
     });
     mo.observe(document.body, { childList: true, subtree: true });
   }
