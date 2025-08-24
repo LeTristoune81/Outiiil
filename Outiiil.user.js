@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Outiiil
 // @author      WhiteRabbit
-// @version     2.1.24
+// @version     2.1.25
 // @description Outiil de Hraesvelg Modifié par WhiteRabbit
 // @match       http://*.fourmizzz.fr/*
 // @run-at      document-end
@@ -76,37 +76,6 @@
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Reine.js
  // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Ressource.js
 // ==/UserScript==
-
-/* Alias sûr pour IMG_UPDATE – aucun let/const/var, pas d’accès TDZ */
-(function (g) {
-  // On n'utilise PAS l'identifiant IMG_UPDATE : on passe par la propriété global (window)
-  if (!Object.prototype.hasOwnProperty.call(g, 'IMG_UPDATE')) {
-    // Crée un alias paresseux : tant qu’une vraie valeur n’arrive pas, on pointe sur tes icônes existantes.
-    try {
-      Object.defineProperty(g, 'IMG_UPDATE', {
-        configurable: true,
-        enumerable: false,
-        get: function () {
-          return g.IMG_ACTUALISER || g.IMG_CHANGE || 'https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/actualize_on_01.png';
-        },
-        set: function (v) {
-          // Si plus tard un fichier définit explicitement IMG_UPDATE, on fige la valeur.
-          Object.defineProperty(g, 'IMG_UPDATE', {
-            value: v,
-            configurable: true,
-            enumerable: false,
-            writable: true
-          });
-        }
-      });
-    } catch (e) {
-      // En cas de sandbox exotique, on fait un simple fallback sans déclaration
-      try { g.IMG_UPDATE = g.IMG_ACTUALISER || g.IMG_CHANGE; } catch(_) {}
-    }
-  }
-})(window);
-
-
 /*
  * main.js — version Manitas, adapté GitHub
  * (logic identique, on ne touche pas aux const métiers)
