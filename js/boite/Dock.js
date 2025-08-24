@@ -121,7 +121,6 @@ class Dock {
             .closest(".o_toolbarItem").remove();
 
     // Injection des nouveaux items
-    o_injectUpdateButton($toolbar);
     o_injectTdcButton($toolbar);
 
     // Tooltips de base pour les items existants (selon position)
