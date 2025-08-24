@@ -1,5 +1,8 @@
-/* Outiiil — Parseur Traceur TDC (ASCII Toolzzz, en-têtes centrés, Net vert/rouge)
- * Fenêtre déplaçable + redimensionnable, compteur de lignes, appariement flux (n-vers-m).
+/* Outiiil — Parseur Traceur TDC (Journal persistant, ASCII Toolzzz, en-têtes centrés, Net vert/rouge)
+ * - Onglet "Journal" avec autosave (localStorage), import/export .txt, drop fichier, purge doublons
+ * - Fenêtre déplaçable + redimensionnable (pos/taille mémorisées)
+ * - Compteur de lignes
+ * - Appariement "flux" n-vers-m
  * API globale window.OutiiilTDC.{open,close,toggle,fill,parse}
  */
 (function(){
@@ -10,7 +13,11 @@ const COLOR_POS  = '#008000';   // vert
 const COLOR_NEG  = '#8B0000';   // rouge
 const COLOR_DOTS = '#AAAAAA';   // points gris
 
-/* ==================== UI (panneau uniquement) ==================== */
+const LS_POS     = 'OutiiilTDC:pos';
+const LS_SIZE    = 'OutiiilTDC:size';
+const LS_JOURNAL = 'OutiiilTDC:journal';  // contenu persistant du Journal
+
+/* ==================== UI ==================== */
 const host=document.createElement('div');
 Object.assign(host.style,{position:'fixed',inset:'auto 18px 18px auto',zIndex:999999,fontFamily:'system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif'});
 document.body.appendChild(host);
@@ -44,6 +51,7 @@ kbd{background:#0c1526;border:1px solid #1b2332;border-radius:6px;padding:1px 5p
 .resizer::before,.resizer::after{content:"";position:absolute;border-color:#1b2332;border-style:solid;opacity:.8}
 .resizer::before{right:0;bottom:0;border-width:0 2px 2px 0;width:12px;height:12px;border-radius:0 0 2px 0}
 .resizer::after{right:3px;bottom:3px;border-width:0 2px 2px 0;width:9px;height:9px;border-radius:0 0 2px 0}
+small.badge{opacity:.8}
 </style>
 
 <div id="panel" class="panel">
@@ -56,7 +64,7 @@ kbd{background:#0c1526;border:1px solid #1b2332;border-radius:6px;padding:1px 5p
   <div class="grid">
     <div>
       <div class="row" style="justify-content:space-between;margin-bottom:6px">
-        <span class="pill">Colle ici tes lignes Discord (gros pavé OK)</span>
+        <span class="pill">Colle ici tes lignes Discord (presse-papiers ponctuel)</span>
         <button id="sample" class="btn2">Exemple</button>
       </div>
       <textarea id="raw" placeholder="— 17/08/2025 08:42
@@ -68,6 +76,8 @@ APP
       <div class="row" style="margin-top:8px">
         <button id="analyze" class="btn2">Analyser</button>
         <button id="clear" class="btn2">Vider</button>
+        <button id="import" class="btn2">Importer .txt</button>
+        <input id="file" type="file" accept=".txt,.log,.csv,.json" style="display:none">
         <span class="muted">Raccourci : <kbd>Alt</kbd>+<kbd>T</kbd></span>
       </div>
     </div>
@@ -79,6 +89,7 @@ APP
         <div class="tab" data-tab="alli">Alliances</div>
         <div class="tab" data-tab="ups">UPs</div>
         <div class="tab" data-tab="orph">Orphelines</div>
+        <div class="tab" data-tab="journal">Journal</div>
       </div>
 
       <div class="row" style="padding:0 10px 6px 10px">
@@ -122,6 +133,21 @@ APP
         </div>
         <div class="scroll"><table id="tblOrph"></table></div>
       </div>
+
+      <div id="panel-journal" style="display:none">
+        <div class="row" style="padding:0 10px 6px 10px;justify-content:space-between">
+          <div class="row">
+            <button id="journalAnalyze" class="btn2">Analyser le journal</button>
+            <button id="journalImport"  class="btn2">Importer .txt</button>
+            <button id="journalExport"  class="btn2">Exporter .txt</button>
+            <button id="journalDedupe"  class="btn2">Purger doublons</button>
+            <button id="journalClear"   class="btn2">Vider</button>
+            <input id="journalFile" type="file" accept=".txt,.log,.csv,.json" style="display:none">
+          </div>
+          <small class="badge muted" id="journalStats"></small>
+        </div>
+        <textarea id="journal" placeholder="Colle ici en continu (persisté dans ce navigateur). Tu peux aussi glisser-déposer un fichier .txt."></textarea>
+      </div>
     </div>
   </div>
 
@@ -142,14 +168,15 @@ function updateScrollHeights(){
   const panel = $('#panel');
   if (!panel || !panel.classList.contains('show')) return;
   const rectP = panel.getBoundingClientRect();
-  const panels = ['tx','agg','alli','ups','orph'].map(k=>$('#panel-'+k));
+  const panels = ['tx','agg','alli','ups','orph','journal'].map(k=>$('#panel-'+k));
   const shown = panels.find(p => p && p.style.display !== 'none');
   if(!shown) return;
-  const sc = shown.querySelector('.scroll');
+  const sc = shown.querySelector('.scroll') || shown.querySelector('textarea');
   if(!sc) return;
   const top = sc.getBoundingClientRect().top - rectP.top;
   const avail = Math.max(120, rectP.height - top - 12);
-  sc.style.maxHeight = avail + 'px';
+  if(sc.classList.contains('scroll')) sc.style.maxHeight = avail + 'px';
+  else sc.style.minHeight = Math.max(200, avail) + 'px';
 }
 
 /* toggle avec recalage du scroll quand on ouvre */
@@ -161,12 +188,9 @@ let toggle = ()=>{
 $('#close').addEventListener('click',toggle);
 window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T')){ e.preventDefault(); toggle(); }});
 
-/* ===== Fenêtre déplaçable + position persistée (drag) + redimensionnable ===== */
+/* ===== Fenêtre déplaçable + redimensionnable (pos/taille mémorisées) ===== */
 (() => {
-  const POS_KEY = 'OutiiilTDC:pos';
-  const SIZ_KEY = 'OutiiilTDC:size';
-
-  const root = (typeof shadow !== 'undefined' && shadow && typeof shadow.querySelector === 'function') ? shadow : document;
+  const root = shadow;
   const panelEl  = root.querySelector('#panel');
   const headerEl = root.querySelector('.hdr');
   const resEl    = root.querySelector('#resizerBR');
@@ -189,7 +213,7 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
   }
   function loadPos() {
     try {
-      const s = localStorage.getItem(POS_KEY);
+      const s = localStorage.getItem(LS_POS);
       if (!s) return false;
       const { left, top } = JSON.parse(s) || {};
       if (Number.isFinite(left) && Number.isFinite(top)) {
@@ -207,21 +231,20 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
     const L = parseInt(panelEl.style.left, 10);
     const T = parseInt(panelEl.style.top, 10);
     if (Number.isFinite(L) && Number.isFinite(T)) {
-      localStorage.setItem(POS_KEY, JSON.stringify({ left: L, top: T }));
+      localStorage.setItem(LS_POS, JSON.stringify({ left: L, top: T }));
     }
   }
   function resetPosBottomRight() {
-    localStorage.removeItem(POS_KEY);
+    localStorage.removeItem(LS_POS);
     panelEl.style.left = '';
     panelEl.style.top  = '';
     panelEl.style.right  = '18px';
     panelEl.style.bottom = '18px';
   }
 
-  // ---- Taille persistée
   function loadSize(){
     try{
-      const s = localStorage.getItem(SIZ_KEY);
+      const s = localStorage.getItem(LS_SIZE);
       if(!s) return false;
       const {w,h} = JSON.parse(s)||{};
       if(Number.isFinite(w)) panelEl.style.width  = w+'px';
@@ -232,10 +255,10 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
   function saveSize(){
     const curW = Math.round(parseFloat(panelEl.style.width)  || panelEl.getBoundingClientRect().width);
     const curH = Math.round(parseFloat(panelEl.style.height) || panelEl.getBoundingClientRect().height);
-    localStorage.setItem(SIZ_KEY, JSON.stringify({w:curW, h:curH}));
+    localStorage.setItem(LS_SIZE, JSON.stringify({w:curW, h:curH}));
   }
 
-  // ---- Drag position
+  // Drag
   let dragging = false, offsetX = 0, offsetY = 0;
   headerEl.addEventListener('mousedown', (e) => {
     if (e.button !== 0) return;
@@ -262,11 +285,11 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
     if (!dragging) return;
     dragging = false;
     headerEl.style.cursor = 'move';
-    savePos();
+    saveSize(); savePos();
   });
   headerEl.addEventListener('dblclick', (e) => { e.preventDefault(); resetPosBottomRight(); });
 
-  // ---- Resize (poignée bas-droite)
+  // Resize (poignée bas-droite)
   let resizing=false, sx=0, sy=0, sw=0, sh=0;
   resEl.addEventListener('mousedown', (e)=>{
     if(e.button!==0) return;
@@ -298,12 +321,11 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
 
   window.addEventListener('resize', ()=>{ clampIntoViewport(); updateScrollHeights(); });
 
-  loadSize();
-  loadPos();
+  loadSize(); loadPos();
   requestAnimationFrame(updateScrollHeights);
 })();
 
-/* ==================== Events / helpers UI ==================== */
+/* ==================== Events généraux ==================== */
 function setStatus(m){$('#status').textContent=m;}
 function clearTables(){['tblTx','tblAgg','tblAlli','tblUps','tblOrph'].forEach(id=>$('#'+id).innerHTML='');}
 function disableCopy(){['copyTx','copyAgg','copyAlli','copyUps','copyOrph'].forEach(id=>$('#'+id).disabled=true);}
@@ -317,7 +339,7 @@ shadow.querySelectorAll('.tab').forEach(tab=>{
     shadow.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     const k=tab.dataset.tab;
-    ['tx','agg','alli','ups','orph'].forEach(x=>{$(`#panel-${x}`).style.display=(x===k?'block':'none');});
+    ['tx','agg','alli','ups','orph','journal'].forEach(x=>{$(`#panel-${x}`).style.display=(x===k?'block':'none');});
     requestAnimationFrame(updateScrollHeights);
   });
 });
@@ -338,6 +360,126 @@ $('#copyAlli').addEventListener('click',()=>copyToClipboard(wrapCode(buildAsciiA
 $('#copyUps').addEventListener('click',()=>copyToClipboard(wrapCode(buildAsciiUps(view.ups))));
 $('#copyOrph').addEventListener('click',()=>copyToClipboard(wrapCode(buildAsciiOrph(view.orph))));
 
+/* ===== Import ponctuel côté "Raw" ===== */
+$('#import').addEventListener('click', ()=> $('#file').click());
+$('#file').addEventListener('change', async (e)=>{
+  const f = e.target.files?.[0];
+  if(!f) return;
+  try{
+    const txt = await f.text();
+    $('#raw').value = txt;
+    setStatus(`${fmt.format(txt.length)} caractères chargés depuis ${esc(f.name)}`);
+  }catch(err){
+    console.error(err);
+    setStatus('Erreur de lecture du fichier.');
+  }finally{
+    e.target.value = '';
+  }
+});
+
+/* ==================== Journal persistant ==================== */
+function loadJournal(){
+  try{ return localStorage.getItem(LS_JOURNAL) || ''; }catch(e){ return ''; }
+}
+function saveJournal(s){
+  try{ localStorage.setItem(LS_JOURNAL, s || ''); }catch(e){}
+}
+function journalUpdateStats(){
+  const ta = $('#journal');
+  const len = ta.value.length;
+  const lines = ta.value ? ta.value.split(/\r?\n/).length : 0;
+  $('#journalStats').textContent = `${fmt.format(lines)} lignes · ${fmt.format(len)} caractères`;
+}
+function journalDedupeInPlace(){
+  const ta = $('#journal');
+  const seen = new Set();
+  const out = [];
+  for(const line of ta.value.split(/\r?\n/)){
+    const s = line.trimEnd(); // on conserve l'ordre, on ignore juste les doublons stricts
+    if(seen.has(s)) continue;
+    seen.add(s);
+    out.push(s);
+  }
+  ta.value = out.join('\n');
+  saveJournal(ta.value);
+  journalUpdateStats();
+  setStatus('Journal : doublons purgés ✅');
+}
+
+// init journal
+$('#journal').value = loadJournal();
+journalUpdateStats();
+
+// autosave + stats
+let jTimer=null;
+$('#journal').addEventListener('input', ()=>{
+  if(jTimer) clearTimeout(jTimer);
+  jTimer = setTimeout(()=>{
+    saveJournal($('#journal').value);
+    journalUpdateStats();
+  }, 200);
+});
+
+// drag & drop fichier dans Journal
+(() => {
+  const ta = $('#journal');
+  ['dragenter','dragover'].forEach(ev =>
+    ta.addEventListener(ev, e => { e.preventDefault(); e.dataTransfer.dropEffect='copy'; })
+  );
+  ta.addEventListener('drop', async (e)=>{
+    e.preventDefault();
+    const f = e.dataTransfer.files?.[0];
+    if(!f) return;
+    try{
+      const txt = await f.text();
+      ta.value = txt;           // remplace (si tu préfères additionner : ta.value += "\n"+txt)
+      saveJournal(ta.value);
+      journalUpdateStats();
+      setStatus(`${fmt.format(txt.length)} caractères chargés dans le journal (drop)`);
+    }catch(err){
+      console.error(err);
+      setStatus('Erreur de lecture du fichier (drop).');
+    }
+  });
+})();
+
+// boutons journal
+$('#journalAnalyze').addEventListener('click', ()=>{
+  const txt=$('#journal').value;
+  if(!txt.trim()){ setStatus('Journal vide.'); return; }
+  try{ renderAll(parseAll(txt)); requestAnimationFrame(updateScrollHeights); }catch(err){ setStatus('Erreur: '+(err?.message||err)); console.error(err); }
+});
+$('#journalImport').addEventListener('click', ()=> $('#journalFile').click());
+$('#journalFile').addEventListener('change', async (e)=>{
+  const f = e.target.files?.[0];
+  if(!f) return;
+  try{
+    const txt = await f.text();
+    $('#journal').value = txt;       // remplace (ou += pour concaténer)
+    saveJournal($('#journal').value);
+    journalUpdateStats();
+    setStatus(`${fmt.format(txt.length)} caractères importés dans le journal depuis ${esc(f.name)}`);
+  }catch(err){
+    console.error(err);
+    setStatus('Erreur de lecture du fichier (journal).');
+  }finally{
+    e.target.value = '';
+  }
+});
+$('#journalExport').addEventListener('click', ()=>{
+  const blob = new Blob([$('#journal').value], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'journal_tdc.txt';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+});
+$('#journalDedupe').addEventListener('click', journalDedupeInPlace);
+$('#journalClear').addEventListener('click', ()=>{
+  if(!confirm('Vider totalement le journal ?')) return;
+  $('#journal').value=''; saveJournal(''); journalUpdateStats(); setStatus('Journal vidé.');
+});
+
 /* ==================== Parsing ==================== */
 function parseAll(text){
   const linesRaw=text.split(/\r?\n/);
@@ -346,6 +488,7 @@ function parseAll(text){
   const stat = { total: lines.length, recognized: 0, ignored: 0, dates:0, players:0 };
 
   const blocks=[]; let current=null;
+  let anchorDate = null; // dernière date FR "dd/mm/yyyy" rencontrée (sert pour heures seules)
 
   // dates / balises
   const reDate1=/^(?:—\s*)?(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})$/;   // 17/08/2025 08:42
@@ -377,6 +520,7 @@ function parseAll(text){
     if(m=raw.match(reDate1)){
       stat.recognized++; stat.dates++;
       const d=m[1], t=m[2];
+      anchorDate = d; // ancre pour heures seules suivantes
       const tsMs = frToMs(d, t);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
@@ -385,6 +529,7 @@ function parseAll(text){
     if(m=raw.match(reHier)){
       stat.recognized++; stat.dates++;
       const resolved = shiftDate(todayFR(), -1);
+      anchorDate = resolved;
       const tsMs = frToMs(resolved, m[1]);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
@@ -392,14 +537,16 @@ function parseAll(text){
     }
     if(m=raw.match(reAuj)){
       stat.recognized++; stat.dates++;
-      const tsMs = frToMs(todayFR(), m[1]);
+      anchorDate = todayFR();
+      const tsMs = frToMs(anchorDate, m[1]);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
       continue;
     }
     if(m=raw.match(reTimeOnly)){
       stat.recognized++; stat.dates++;
-      const tsMs = frToMs(todayFR(), m[1]);
+      const base = anchorDate || todayFR();
+      const tsMs = frToMs(base, m[1]);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
       continue;
@@ -407,7 +554,7 @@ function parseAll(text){
     if(m=raw.match(rePlayer)){
       stat.recognized++; stat.players++;
       if(!current){
-        const base = todayFR();
+        const base = anchorDate || todayFR();
         const tsMs = frToMs(base, '00:00');
         current={tsLabel:`${base} 00:00`, ts:tsMs, entries:[]};
         blocks.push(current);
@@ -421,7 +568,7 @@ function parseAll(text){
       current.entries.push({name,ally,signAmt,kind,before,after,raw});
       continue;
     }
-    // sinon, inconnue -> on comptera dans "ignorées"
+    // sinon : inconnue -> comptera dans "ignorées"
   }
 
   stat.ignored = stat.total - stat.recognized;
@@ -454,7 +601,7 @@ function parseAll(text){
       if(L.rem===0) j++;
     }
 
-    // Restes -> orphelines (si des montants n'ont pas trouvé toute la contrepartie)
+    // Restes -> orphelines
     for(; i<winners.length; i++){
       const W = winners[i];
       if(W.rem>0) orph.push({ts:b.ts, tsLabel:b.tsLabel, who:W.name, ally:W.ally, signAmt:+W.rem, before:W.before, after:W.after, kind:'tdc', block:idx});
@@ -647,25 +794,21 @@ function buildAsciiOrph(list){
 }
 
 /* ==================== Helpers ==================== */
-// date du jour au format FR
 function todayFR(){
   const d = new Date();
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
 }
-// J+dd à partir d'une date FR (LOCAL)
 function shiftDate(fr,dd){
   const [d,m,y]=fr.split('/').map(n=>+n);
   const dt=new Date(y,m-1,d);
   dt.setDate(dt.getDate()+dd);
   return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}/${dt.getFullYear()}`;
 }
-// FR "dd/mm/yyyy" + "HH:MM" -> timestamp (ms) LOCAL
 function frToMs(frDate, hhmm){
   const [d,m,y]=frDate.split('/').map(Number);
   const [H,M]=hhmm.split(':').map(Number);
   return new Date(y,m-1,d,H,M,0,0).getTime();
 }
-// timestamp (ms) -> "dd/mm/yyyy HH:MM"
 function dispDate(ms){
   const d=new Date(ms);
   const dd=String(d.getDate()).padStart(2,'0');
@@ -675,7 +818,6 @@ function dispDate(ms){
   const MM=String(d.getMinutes()).padStart(2,'0');
   return `${dd}/${mm}/${yy} ${HH}:${MM}`;
 }
-// nombre robuste (garde le signe, gère NBSP \u00A0 et fines \u202F, normalise en-dash)
 function num(s){
   const raw=String(s).replace(/[\u00A0\u202F\s]+/g,'');
   const m=raw.match(/^([+\-–]?)(\d.*)$/);
@@ -691,7 +833,6 @@ async function copyToClipboard(text){
   try{await navigator.clipboard.writeText(text); setStatus('ASCII copié ✅');}
   catch{const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); setStatus('ASCII copié (fallback) ✅');}
 }
-// normalise le type
 function normKind(k){
   if (/tdc/i.test(k)) return 'tdc';
   if (/fourmi/i.test(k)) return 'fourmiliere';
@@ -719,6 +860,14 @@ Fourmeline(LHDC): -46 117 353 tdc | 230 586 767 => 184 469 414
 kingkong(LHDC): +46 117 353 tdc | 398 079 793 => 444 197 146
 Fourmeline(LHDC): +37 079 526 tdc | 184 469 414 => 221 548 940
 Nova-kun(LHDC): -37 079 526 tdc | 134 412 725 => 97 333 199
+
+— Hier à 03:47
+Christheall(TRID): +7 674 044 730 tdc | 19 994 459 168 => 27 668 503 898
+mamandepatateetdragon(NOIR): -7 674 044 730 tdc | 38 370 223 653 => 30 696 178 923
+— 08:12
+panoupanou(-FADA): +1 fourmiliere | 447 => 448
+— 15/08/2025 07:56
+lyse-mo(-FADA): +1 technologie | 241 => 242
 `;
 
 })();
