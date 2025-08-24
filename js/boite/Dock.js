@@ -11,10 +11,6 @@
 const SPRITE_MENU_FALLBACK = "images/sprite_menu.png";
 const IMG_SPRITE = (typeof IMG_SPRITE_MENU !== "undefined" && IMG_SPRITE_MENU) ? IMG_SPRITE_MENU : SPRITE_MENU_FALLBACK;
 
-// Icône bouton "Mise à jour" (tu peux garder l’existant si tu en as un autre)
-const IMG_UPDATE = (typeof IMG_UPDATE !== "undefined" && IMG_UPDATE) ? IMG_UPDATE
-  : "https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/images/update.png";
-
 // Icône bouton "Parser TDC" (local dans /images)
 const IMG_RADAR  = "images/radar.png";
 
