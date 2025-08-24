@@ -28,7 +28,7 @@ class PageMessagerie
     executer()
     {
         // ajout des boutons pour les nouveaux messages
-        if(!Utils.comptePlus) this.plus(0);
+        if(!(window.Utils && Utils.comptePlus)) this.plus(0);
         // recupération des joueurs de l'utilitaire
         if(monProfil.parametre["forumMembre"].valeur){
             // recuperation des commandes sur l'utilitaire
@@ -46,42 +46,72 @@ class PageMessagerie
     /**
     *
     */
-    analyseMessage()
-    {
-        // Listener pour l'ouverture des rapports de combat ou de chasse.
-        $("#corps_messagerie").on("DOMNodeInserted", (e) => {
-            // Si on ouvre le message pour la première fois
-            if($(e.target).hasClass("contenu_conversation")){
-                // correction pour chrome
-                $(".message").removeAttr("colspan");
-                let titreMess = $(e.target).prev().prev().find(".td_objet").text();
-                // Si on est sur des rapports des chasses
-                if(titreMess.includes("chasseuses ont conquis")){
-                    let conv = $(e.target).prev().prev().attr("id").split("_")[1];
-                    $(e.target).find(".message").each((i, elt) => {this.analyseChasse(conv, $(elt).parent().attr("id"), $(elt).text());});
-                    // on affiche un bilan que lorsqu'il y a plus d'une chasse
-                    if($(e.target).find(".message").length > 1) this.analyseChasses(conv);
-                // Si on est sur des rapports de combat
-                }else if(titreMess.includes("Attaque réussie") || titreMess.includes("Attaque échouée") || titreMess.includes("Invasion") || titreMess.includes("Rebellion")){
-                    $(e.target).find(".message").each((i, elt) => {this.analyseCombat($(elt).parent().attr("id"), $(elt).prev().text(), $(elt).text());});
-                    this.optionMessage($(e.target).find(".message:first").parent().attr("id"));
-                }
-                // Ajout des balises de mise en forme pour envoyer des messages
-                if($(e.target).find("div[id^='champ_bbcode_']").length && !Utils.comptePlus)
-                    this.plus($(e.target).find("div[id^='champ_bbcode_']").attr("id").match(/\d+$/));
+        // Listener moderne pour l'ouverture des rapports (robuste aux mutations)
+analyseMessage()
+{
+    const target = document.querySelector('#corps_messagerie') || document.body;
+
+    const handleNode = (node) => {
+        // Si on ouvre le message pour la première fois
+        if (node.nodeType === 1 && node.classList.contains("contenu_conversation")) {
+            // correction pour chrome
+            $(".message").removeAttr("colspan");
+
+            // Récup objet + id conv de manière tolérante
+            let $node   = $(node);
+            let $header = $node.prev().prev();
+            if (!$header.find(".td_objet").length) {
+                // fallback si la structure a changé
+                $header = $node.closest("[id^='conversation_'], .conversation, .bloc_conversation").prev();
             }
-            // Si on affiche plus de message
-            else if($(e.target).attr("id") && $(e.target).attr("id").includes("message_")){
-                // Si on affiche plus de message d'un rapport de chasse
-                if($(e.target).closest(".contenu_conversation").prev().prev().find(".td_objet").text().includes("chasseuses ont conquis")){
-                    let conv = $(e.target).parents().eq(3).prevAll().eq(1).attr("id").split("_")[1];
-                    this.analyseChasse(conv, $(e.target).find(".message").parent().attr("id"), $(e.target).find(".message").text()).analyseChasses(conv);
-                }
+            const titreMess = ($header.find(".td_objet, .td_objet_conversation, .objet").first().text() || "").trim();
+
+            // id de conv robuste
+            let conv = ($header.attr("id") || "").split("_").pop();
+            if (!conv) {
+                const cand = $node.parents().toArray().map(el => el.id || "").find(id => /^conversation_|^entete_conversation_/.test(id));
+                if (cand) conv = cand.split("_").pop();
             }
-            if($(e.target).attr("id") && $(e.target).attr("id").includes("liste_conversations"))
-                this.couleurMessage();
-        });
-    }
+
+            // --- Ta logique existante (inchangée) ---
+            // Si on est sur des rapports des chasses
+            if (titreMess.includes("chasseuses ont conquis")) {
+                $node.find(".message").each((i, elt) => this.analyseChasse(conv, $(elt).parent().attr("id"), $(elt).text()));
+                if ($node.find(".message").length > 1) this.analyseChasses(conv);
+            // Si on est sur des rapports de combat
+            } else if (titreMess.includes("Attaque réussie") || titreMess.includes("Attaque ratée") || titreMess.includes("Invasion") || titreMess.includes("Rebellion")) {
+                $node.find(".message").each((i, elt) => this.analyseCombat($(elt).parent().attr("id"), $(elt).prev().text(), $(elt).text()));
+                this.optionMessage($node.find(".message:first").parent().attr("id"));
+            }
+
+            // Ajout des balises de mise en forme pour envoyer des messages (bouton “+”)
+            const $bb = $node.find("div[id^='champ_bbcode_']");
+            if ($bb.length && !(window.Utils && Utils.comptePlus)) {
+                const m = ($bb.attr("id") || "").match(/\d+$/);
+                if (m) this.plus(m[0]);
+            }
+        }
+
+        // Quand la liste de conversations est (ré)affichée → recouleur
+        if (node.nodeType === 1 && node.id && node.id.includes("liste_conversations")) {
+            this.couleurMessage();
+        }
+    };
+
+    // Première passe (si contenu déjà présent)
+    (target.querySelectorAll(".contenu_conversation") || []).forEach(n => handleNode(n));
+
+    // Observateur de mutations
+    const mo = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+            if (m.addedNodes && m.addedNodes.length) {
+                m.addedNodes.forEach(handleNode);
+            }
+        }
+    });
+    mo.observe(target, { childList: true, subtree: true });
+}
+
     /**
     *
     */
