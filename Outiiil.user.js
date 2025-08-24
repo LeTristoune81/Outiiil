@@ -7,8 +7,8 @@
 // @run-at      document-end
 // @noframes
 
-// @downloadURL  https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/Outiil.user.js
-// @updateURL    https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/Outiil.user.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/Outiiil.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/Outiiil.user.js
 
 
  // @require     https://ajax.googleapis.com/ajax/libs/jquery/2.2.1/jquery.min.js
