@@ -14,6 +14,5 @@
   g.IMG_DOWN        = g.IMG_DOWN        || CDN + "down.png";
   g.IMG_UP          = g.IMG_UP          || CDN + "up.png";
   g.IMG_OUTIIIL     = g.IMG_OUTIIIL     || CDN + "outiiil.png";
-  // Compat “anciens modules” :
-  g.IMG_UPDATE      = g.IMG_UPDATE || g.IMG_ACTUALISER;
 })(window);
+
