@@ -15,7 +15,7 @@ const IMG_SPRITE = (typeof IMG_SPRITE_MENU !== "undefined" && IMG_SPRITE_MENU) ?
 const IMG_RADAR  = "images/radar.png";
 
 // ---------- URL Update ----------
-const OUTIIIL_UPDATE_URL = "https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiilv2.user.js";
+const OUTIIIL_UPDATE_URL = "https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/Outiiil.user.js";
 
 function o_openUpdate() {
   if (typeof GM_openInTab === "function") {
