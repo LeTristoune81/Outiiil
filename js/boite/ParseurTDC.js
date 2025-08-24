@@ -1,5 +1,6 @@
 /* Outiiil — Parseur Traceur TDC (ASCII Toolzzz, en-têtes centrés, Net vert/rouge)
- * Intégration Outiiil : pas de bouton Dock ici ; API globale window.OutiiilTDC.{open,close,toggle,fill,parse}
+ * Fenêtre déplaçable + redimensionnable, compteur de lignes, appariement flux (n-vers-m).
+ * API globale window.OutiiilTDC.{open,close,toggle,fill,parse}
  */
 (function(){
 'use strict';
@@ -39,7 +40,6 @@ th{position:sticky;top:0;background:#0f182b;z-index:1}
 .mono{font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace}
 kbd{background:#0c1526;border:1px solid #1b2332;border-radius:6px;padding:1px 5px;font-size:11px}
 .footer{padding:8px 10px;color:#9db0c9;font-size:11px;border-top:1px solid #1b2332;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-/* poignée de redimensionnement */
 .resizer{position:absolute;right:6px;bottom:6px;width:14px;height:14px;cursor:nwse-resize;opacity:.9}
 .resizer::before,.resizer::after{content:"";position:absolute;border-color:#1b2332;border-style:solid;opacity:.8}
 .resizer::before{right:0;bottom:0;border-width:0 2px 2px 0;width:12px;height:12px;border-radius:0 0 2px 0}
@@ -142,15 +142,11 @@ function updateScrollHeights(){
   const panel = $('#panel');
   if (!panel || !panel.classList.contains('show')) return;
   const rectP = panel.getBoundingClientRect();
-
-  // section visible à droite
   const panels = ['tx','agg','alli','ups','orph'].map(k=>$('#panel-'+k));
   const shown = panels.find(p => p && p.style.display !== 'none');
   if(!shown) return;
-
   const sc = shown.querySelector('.scroll');
   if(!sc) return;
-
   const top = sc.getBoundingClientRect().top - rectP.top;
   const avail = Math.max(120, rectP.height - top - 12);
   sc.style.maxHeight = avail + 'px';
@@ -162,7 +158,6 @@ let toggle = ()=>{
   const vis=p.classList.toggle('show');
   if(vis) requestAnimationFrame(updateScrollHeights);
 };
-
 $('#close').addEventListener('click',toggle);
 window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T')){ e.preventDefault(); toggle(); }});
 
@@ -234,7 +229,7 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
       return true;
     }catch(e){ return false; }
   }
-  function saveSize(w,h){
+  function saveSize(){
     const curW = Math.round(parseFloat(panelEl.style.width)  || panelEl.getBoundingClientRect().width);
     const curH = Math.round(parseFloat(panelEl.style.height) || panelEl.getBoundingClientRect().height);
     localStorage.setItem(SIZ_KEY, JSON.stringify({w:curW, h:curH}));
@@ -283,7 +278,6 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
   });
   window.addEventListener('mousemove', (e)=>{
     if(!resizing) return;
-    // limites raisonnables
     const maxW = Math.min(window.innerWidth - 36, 1600);
     const maxH = Math.min(window.innerHeight - 36, 1200);
     let w = sw + (e.clientX - sx);
@@ -302,16 +296,14 @@ window.addEventListener('keydown',(e)=>{ if(e.altKey && (e.key==='t'||e.key==='T
     saveSize();
   });
 
-  // Recalage si la fenêtre change de taille
   window.addEventListener('resize', ()=>{ clampIntoViewport(); updateScrollHeights(); });
 
-  // Au chargement : taille puis position, puis calcule la zone scroll si panel visible
   loadSize();
   loadPos();
   requestAnimationFrame(updateScrollHeights);
 })();
 
-/* ==================== Events ==================== */
+/* ==================== Events / helpers UI ==================== */
 function setStatus(m){$('#status').textContent=m;}
 function clearTables(){['tblTx','tblAgg','tblAlli','tblUps','tblOrph'].forEach(id=>$('#'+id).innerHTML='');}
 function disableCopy(){['copyTx','copyAgg','copyAlli','copyUps','copyOrph'].forEach(id=>$('#'+id).disabled=true);}
@@ -319,6 +311,7 @@ function enableCopy(){['copyTx','copyAgg','copyAlli','copyUps','copyOrph'].forEa
 
 $('#clear').addEventListener('click',()=>{$('#raw').value=''; setStatus(''); clearTables(); disableCopy();});
 $('#sample').addEventListener('click',()=>$('#raw').value=SAMPLE.trim());
+
 shadow.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     shadow.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -328,6 +321,7 @@ shadow.querySelectorAll('.tab').forEach(tab=>{
     requestAnimationFrame(updateScrollHeights);
   });
 });
+
 const filters={player:'',ally:''};
 $('#fPlayer').addEventListener('input',e=>{filters.player=norm(e.target.value); renderAll(state,true);});
 $('#fAlly').addEventListener('input',e=>{filters.ally=norm(e.target.value); renderAll(state,true);});
@@ -346,7 +340,11 @@ $('#copyOrph').addEventListener('click',()=>copyToClipboard(wrapCode(buildAsciiO
 
 /* ==================== Parsing ==================== */
 function parseAll(text){
-  const lines=text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const linesRaw=text.split(/\r?\n/);
+  const lines=linesRaw.map(s=>s.trim()).filter(Boolean);
+
+  const stat = { total: lines.length, recognized: 0, ignored: 0, dates:0, players:0 };
+
   const blocks=[]; let current=null;
 
   // dates / balises
@@ -374,44 +372,40 @@ function parseAll(text){
 
   for(const raw of lines){
     if(reNoise.test(raw)) continue;
-    let m;
 
-    // Date explicite => telle quelle
+    let m;
     if(m=raw.match(reDate1)){
+      stat.recognized++; stat.dates++;
       const d=m[1], t=m[2];
       const tsMs = frToMs(d, t);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
       continue;
     }
-
-    // Hier à HH:MM => J-1 par rapport à AUJOURD'HUI
     if(m=raw.match(reHier)){
+      stat.recognized++; stat.dates++;
       const resolved = shiftDate(todayFR(), -1);
       const tsMs = frToMs(resolved, m[1]);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
       continue;
     }
-
-    // Aujourd'hui à HH:MM => aujourd'hui
     if(m=raw.match(reAuj)){
+      stat.recognized++; stat.dates++;
       const tsMs = frToMs(todayFR(), m[1]);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
       continue;
     }
-
-    // HH:MM seul => aujourd'hui
     if(m=raw.match(reTimeOnly)){
+      stat.recognized++; stat.dates++;
       const tsMs = frToMs(todayFR(), m[1]);
       current={tsLabel:raw.replace(/^—\s*/,''), ts:tsMs, entries:[]};
       blocks.push(current);
       continue;
     }
-
-    // Ligne joueur
     if(m=raw.match(rePlayer)){
+      stat.recognized++; stat.players++;
       if(!current){
         const base = todayFR();
         const tsMs = frToMs(base, '00:00');
@@ -427,31 +421,51 @@ function parseAll(text){
       current.entries.push({name,ally,signAmt,kind,before,after,raw});
       continue;
     }
+    // sinon, inconnue -> on comptera dans "ignorées"
   }
 
+  stat.ignored = stat.total - stat.recognized;
+
+  // ---- Construction tx/orph/ups avec appariement "flux" n-vers-m par bloc ----
   const tx=[], orph=[], ups=[];
   blocks.forEach((b,idx)=>{
-    const gains=[], losses=[], others=[];
+    const winners=[], losers=[];
     for(const e of b.entries){
-      if(e.kind==='tdc'){ (e.signAmt>0?gains:losses).push(e); }
-      else others.push(e);
+      if(e.kind==='tdc'){
+        if(e.signAmt>0) winners.push({...e, rem: Math.abs(e.signAmt)});
+        else            losers .push({...e, rem: Math.abs(e.signAmt)});
+      }else{
+        ups.push({ts:b.ts, tsLabel:b.tsLabel, player:e.name, ally:e.ally, type:e.kind, delta:Math.abs(e.signAmt), before:e.before, after:e.after});
+      }
     }
-    others.forEach(u=>ups.push({ts:b.ts, tsLabel:b.tsLabel, player:u.name, ally:u.ally, type:u.kind, delta:Math.abs(u.signAmt), before:u.before, after:u.after}));
-    const usedLoss=new Set(), usedGain=new Set();
 
-    for(let gi=0; gi<gains.length; gi++){
-      const g=gains[gi], amt=Math.abs(g.signAmt); let match=-1;
-      for(let li=0; li<losses.length; li++){ if(usedLoss.has(li)) continue; const l=losses[li]; if(Math.abs(l.signAmt)===amt){ match=li; break; } }
-      if(match>=0){ const l=losses[match]; usedLoss.add(match); usedGain.add(gi);
-        tx.push({ts:b.ts, tsLabel:b.tsLabel, amount:amt,
-          winner:g.name, wAlly:g.ally, wBefore:g.before, wAfter:g.after,
-          loser:l.name, lAlly:l.ally, lBefore:l.before, lAfter:l.after,
-          block:idx, status:'apparié'}); }
+    let i=0, j=0;
+    while(i<winners.length && j<losers.length){
+      const W = winners[i], L = losers[j];
+      const amt = Math.min(W.rem, L.rem);
+      tx.push({
+        ts:b.ts, tsLabel:b.tsLabel, amount:amt,
+        winner:W.name, wAlly:W.ally, wBefore:W.before, wAfter:W.after,
+        loser:L.name, lAlly:L.ally, lBefore:L.before, lAfter:L.after,
+        block:idx, status:'apparié'
+      });
+      W.rem -= amt; L.rem -= amt;
+      if(W.rem===0) i++;
+      if(L.rem===0) j++;
     }
-    gains.forEach((g,gi)=>{ if(!usedGain.has(gi)) orph.push({ts:b.ts, tsLabel:b.tsLabel, who:g.name, ally:g.ally, signAmt:g.signAmt, before:g.before, after:g.after, kind:'tdc', block:idx}); });
-    losses.forEach((l,li)=>{ if(!usedLoss.has(li)) orph.push({ts:b.ts, tsLabel:b.tsLabel, who:l.name, ally:l.ally, signAmt:l.signAmt, before:l.before, after:l.after, kind:'tdc', block:idx}); });
+
+    // Restes -> orphelines (si des montants n'ont pas trouvé toute la contrepartie)
+    for(; i<winners.length; i++){
+      const W = winners[i];
+      if(W.rem>0) orph.push({ts:b.ts, tsLabel:b.tsLabel, who:W.name, ally:W.ally, signAmt:+W.rem, before:W.before, after:W.after, kind:'tdc', block:idx});
+    }
+    for(; j<losers.length; j++){
+      const L = losers[j];
+      if(L.rem>0) orph.push({ts:b.ts, tsLabel:b.tsLabel, who:L.name, ally:L.ally, signAmt:-L.rem, before:L.before, after:L.after, kind:'tdc', block:idx});
+    }
   });
 
+  // ---- Agrégats joueurs / alliances ----
   const aggMap=new Map();
   function touchP(player,ally){ const k=player+'|'+ally; if(!aggMap.has(k)) aggMap.set(k,{player,ally,gain:0,loss:0,first:null,last:null}); return aggMap.get(k);}
   tx.forEach(t=>{ const w=touchP(t.winner,t.wAlly), l=touchP(t.loser,t.lAlly); w.gain+=t.amount; w.first=minDate(w.first,t.ts); w.last=maxDate(w.last,t.ts); l.loss+=t.amount; l.first=minDate(l.first,t.ts); l.last=maxDate(l.last,t.ts);});
@@ -466,11 +480,11 @@ function parseAll(text){
   const distinct=[...new Set(alli.map(a=>a.alliance))].sort((a,b)=>a.localeCompare(b));
   const sel=$('#fAllyQuick'); sel.innerHTML='<option value="">— Alliances détectées —</option>'+distinct.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
 
-  return {tx,agg,alli,ups,orph};
+  return {tx,agg,alli,ups,orph, stat};
 }
 
 /* ==================== Aperçu tables ==================== */
-const state={tx:[],agg:[],alli:[],ups:[],orph:[]};
+const state={tx:[],agg:[],alli:[],ups:[],orph:[],stat:{total:0,recognized:0,ignored:0}};
 const view ={tx:[],agg:[],alli:[],ups:[],orph:[]};
 
 function renderAll(res,onlyFilter=false){
@@ -483,9 +497,11 @@ function renderAll(res,onlyFilter=false){
   view.alli = state.alli.filter(a => !fA || match(a.alliance,fA));
 
   fillTx(); fillAgg(); fillAlli(); fillUps(); fillOrph();
-  setStatus(`Transactions: ${fmt.format(view.tx.length)} · Orphelines: ${fmt.format(view.orph.length)} · UPs: ${fmt.format(view.ups.length)} · Alliances: ${fmt.format(view.alli.length)}`);
+  const S = state.stat;
+  setStatus(`Lignes: ${fmt.format(S.total)} / ${fmt.format(S.recognized)} / ${fmt.format(S.total - S.recognized)} · Tx: ${fmt.format(view.tx.length)} · Orphelines: ${fmt.format(view.orph.length)} · UPs: ${fmt.format(view.ups.length)} · Alliances: ${fmt.format(view.alli.length)}`);
   enableCopy();
 }
+
 const htmlNet = (n)=> `<span style="color:${n>0?COLOR_POS:n<0?COLOR_NEG:'#e7ecf3'}">${fmt.format(n)}</span>`;
 
 function fillTx(){ const t=$('#tblTx'); t.innerHTML=`
@@ -695,17 +711,14 @@ window.OutiiilTDC = (function(){
 
 /* ==================== Données exemple ==================== */
 const SAMPLE=`
-— 17/08/2025 08:42
-Christheall(TRID): +47 420 282 tdc | 274 610 833 => 322 031 115
-eholo(LHDC): -47 420 282 tdc | 237 101 410 => 189 681 128
-APP
-— Hier à 03:47
-Christheall(TRID): +7 674 044 730 tdc | 19 994 459 168 => 27 668 503 898
-mamandepatateetdragon(NOIR): -7 674 044 730 tdc | 38 370 223 653 => 30 696 178 923
-— 08:12
-panoupanou(-FADA): +1 fourmilière | 447 => 448
-— Aujourd’hui à 05:25
-lyse-mo(-FADA): +1 technologie | 241 => 242
+— 15/08/2025 00:50
+Vivince2014(LHDC): +5 685 624 tdc | 32 706 119 => 38 391 743
+jbval(LHDC): -1 305 265 tdc | 17 625 128 => 16 319 863
+tony0768(LHDC): -4 380 359 tdc | 21 901 798 => 17 521 439
+Fourmeline(LHDC): -46 117 353 tdc | 230 586 767 => 184 469 414
+kingkong(LHDC): +46 117 353 tdc | 398 079 793 => 444 197 146
+Fourmeline(LHDC): +37 079 526 tdc | 184 469 414 => 221 548 940
+Nova-kun(LHDC): -37 079 526 tdc | 134 412 725 => 97 333 199
 `;
 
 })();
