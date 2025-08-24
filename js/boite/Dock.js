@@ -51,26 +51,6 @@ function o_isDockVisible() {
   catch(e) { return true; }
 }
 
-// ---------- Injection bouton Update ----------
-function o_injectUpdateButton($toolbar) {
-  if (!$toolbar.length) return;
-  if ($toolbar.find("#o_itemUpdate").length) return;
-
-  const $btn = $(`
-    <div id="o_toolbarItem5" class="o_toolbarItem" title="Mettre à jour">
-      <span id="o_itemUpdate"
-            style="display:inline-block;width:28px;height:28px;
-                   background-image:url(${IMG_UPDATE});
-                   background-size:contain;background-position:center;background-repeat:no-repeat;"></span>
-    </div>`);
-
-  const $pref = $toolbar.find("#o_toolbarItem6");
-  if ($pref.length) $pref.before($btn);
-  else $toolbar.append($btn);
-
-  const opts = o_isDockBas() ? o_tooltipOptionsBas() : o_tooltipOptionsDroite();
-  $("#o_toolbarItem5").tooltip(opts);
-}
 
 // ---------- Injection bouton Parser TDC ----------
 function o_injectTdcButton($toolbar) {
