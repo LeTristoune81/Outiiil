@@ -67,7 +67,7 @@
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Description.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Forum.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Laboratoire.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Messagerie.js
+// @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/refs/heads/main/js/page/Messagerie.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Profil.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Reine.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/page/Ressource.js
