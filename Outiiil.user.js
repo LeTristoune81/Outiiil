@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Outiiil
 // @author      WhiteRabbit
-// @version     2.9.1
+// @version     2.9.2
 // @description Outiil de Hraesvelg Modifié par WhiteRabbit
 // @match       http://*.fourmizzz.fr/*
 // @run-at      document-end
@@ -52,7 +52,7 @@
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/ComptePlus.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Map.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Parametres.js
-// @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Ponte.js
+// @require     https://raw.githubusercontent.com/LeTristoune81/Outiiil/main/js/boite/Ponte.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Radar.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Rang.js
 // @require     https://cdn.jsdelivr.net/gh/LeTristoune81/Outiiil@main/js/boite/Rapport.js
